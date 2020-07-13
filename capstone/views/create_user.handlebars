@@ -1,0 +1,22 @@
+{{#if no_match_pass}}
+     <br>
+         <h3 align="center">Your passwords did not match!</h3>
+{{else}}
+{{/if}}
+
+{{#if dup_email}}
+     <br>
+         <h3 align="center">Sorry! This email has already been taken</h3>
+{{else}}
+{{/if}}
+
+<h2 align="center">Create a profile for your company.</h2>
+<form id="user_info" align="center" action="/create_user" method="post">
+	<label> Representative's First Name: <input name="fname" type="text" required></label><br>
+	<label> Representative's Last Name: <input name="lname" type="text" required></label><br>
+	<label> Email Address: <input name="email_address" type="email" required></label><br>			
+	<label> Password: <input name="password" type="password" required></label><br>
+	<label> Confirm Password: <input name="confirm_password" type="password" required></label><br>
+
+	<input type="submit" value="Create Account" >
+</form>

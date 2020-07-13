@@ -1,0 +1,50 @@
+{{#if create_user_success}}
+     <br>
+         <h3 align="center">You successfully created your account!</h3>
+{{else}}
+{{/if}}
+
+{{#if employer_login_err}}
+     <br>
+         <h3 align="center">We couldn't sign you in!</h3>
+         <h5 align="center">Email or password is incorrect</h5>
+{{else}}
+{{/if}}
+
+{{#if employee_login_email_err}}
+     <br>
+         <h3 align="center">We couldn't sign you in!</h3>
+         <h5 align="center">Your email was not found!</h5>
+{{else}}
+{{/if}}
+
+
+{{#if employee_login_access_code_err}}
+     <br>
+         <h3 align="center">We couldn't sign you in!</h3>
+         <h5 align="center">Your access code is incorrect!</h5>
+{{else}}
+{{/if}}
+
+<h3 style="text-align:center"> Employer Login </h1>
+<form id="login_form1" align="center" action="/login/employer" method="post">
+     Email Address:
+     <input name="employer_email_addr" type="email" placeholder="Enter your email address.."><br>
+     Password:
+     <input name="password" type="password"><br>
+     <input type="submit" value="Login">
+</form>
+<form id="login_form2" align="center" action="/login/create_user" method="get">
+     <input type="submit" value="Create Employer Profile">
+</form>
+<br>
+<br>
+
+<h3 style="text-align:center"> Employee Login </h1>
+<form id="login_form3" align="center" action="/login/employee" method="post">
+     Email Address:
+     <input name="employee_email_addr" type="email" placeholder="Enter your email address.."><br>
+     Access Code:
+     <input name="access_code" type="password"><br>
+     <input type="submit" value="Login">
+</form>
