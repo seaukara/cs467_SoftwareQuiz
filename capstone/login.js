@@ -39,6 +39,7 @@ module.exports = function(){
 
 				else{
 					req.session.employer_id = results[0].employer_id;
+					req.session.employer_name = results[0].fname + " " + results[0].lname;
 					console.log("Employer Session ID: ", req.session.employer_id);
 					res.redirect('/home');
 				}
