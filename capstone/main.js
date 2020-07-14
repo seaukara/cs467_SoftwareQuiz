@@ -19,6 +19,8 @@ app.use('/login', require('./login.js'));
 app.use('/home', require('./home.js'));
 app.use('/quiz', require('./quiz.js'));
 app.use('/create_user', require('./create_user.js'));
+app.use('/results', require('./results.js'));
+// app.use('/quiz_results', require('./results.js'));
 
 app.use(function(req,res){
   res.status(404);
