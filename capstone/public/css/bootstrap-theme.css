@@ -2110,9 +2110,9 @@ fieldset[disabled] .btn-link:focus {
 }
 .btn-sm,
 .btn-xs {
-  padding: 5px 10px;
+  padding: 3px 5px;
   font-size: 12px;
-  line-height: 1.5;
+  /*line-height: 1.5;*/
   border-radius: 3px;
 }
 .btn-xs {
@@ -4708,7 +4708,7 @@ a.list-group-item:focus {
 .panel-default > .panel-heading {
   color: #2b2b2b;
   background-color: #f5f5f5;
-  border-color: #dddddd;
+  /*border-color: #dddddd;*/
 }
 .panel-default > .panel-heading + .panel-collapse .panel-body {
   border-top-color: #dddddd;

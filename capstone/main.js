@@ -15,12 +15,25 @@ app.set('view engine', 'handlebars');
 app.set('port', 2424);
 app.set('mysql', mysql);
 
+
+
 app.use('/login', require('./login.js'));
 app.use('/home', require('./home.js'));
 app.use('/quiz', require('./quiz.js'));
 app.use('/create_user', require('./create_user.js'));
+app.use('/create_employee', require('./create_employee.js'));
+
+
 app.use('/results', require('./results.js'));
 // app.use('/quiz_results', require('./results.js'));
+
+app.use('/', function(req,res){
+  if (req.session.employer_id) {
+    res.redirect('home');
+  } else {
+    res.render('login');
+  }
+});
 
 app.use(function(req,res){
   res.status(404);

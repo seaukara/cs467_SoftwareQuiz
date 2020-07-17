@@ -140,7 +140,8 @@ table tr th { color: #688a7e;}
 
 .login-img-body{
 
-  background: url('../img/bg-1.jpg') no-repeat center center fixed;
+  background: none; 
+    /*url('../img/bg-1.jpg') no-repeat center center fixed;*/
 
   -webkit-background-size: cover;
 
@@ -154,7 +155,8 @@ table tr th { color: #688a7e;}
 
 .login-img2-body{
 
-  background: url('../img/bg-1.jpg') no-repeat center center fixed;
+  background: none;
+/*url('../img/bg-1.jpg') no-repeat center center fixed;*/
 
   -webkit-background-size: cover;
 
@@ -168,7 +170,8 @@ table tr th { color: #688a7e;}
 
 .login-img3-body{
 
-  background: url('../img/bg-1.jpg') no-repeat center center fixed;
+  background: none;
+/*url('../img/bg-1.jpg') no-repeat center center fixed;*/
 
   -webkit-background-size: cover;
 
@@ -970,7 +973,7 @@ ul.sidebar-menu li.active a i {
 
 #main-content {
 
-    margin-left: 180px;
+    margin-left: 0px;
 
 }
 
@@ -1069,7 +1072,7 @@ a.logo {
 a.logo:hover, a.logo:focus {
 
     text-decoration: none;
-
+    font-weight: 400;
     outline: none;
 
 }
@@ -1248,7 +1251,7 @@ ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
 
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.176) !important;
 
-    };
+    }
 
 }
 
@@ -1718,7 +1721,8 @@ div[data-role="editor-toolbar"] {
 
 .log-arrow-up {
 
-    background: url("../img/arrow-up.png") no-repeat;
+    background: none; 
+/*url("../img/arrow-up.png") no-repeat;*/
 
     width: 20px;
 
@@ -2184,7 +2188,7 @@ div[data-role="editor-toolbar"] {
 
   border-top:1px solid #e6e6e6 ;
 
-  border-left:1px solid #e6e6e6 ;
+  /*border-left:1px solid #e6e6e6 ;*/
 
   border-right:1px solid #e6e6e6 ;
 
@@ -2266,7 +2270,7 @@ div[data-role="editor-toolbar"] {
 
   color: #333;
 
-  border-left: 1px solid rgba(0,0,0,.09);
+  /*border-left: 1px solid rgba(0,0,0,.09);*/
 
 }
 
@@ -2390,7 +2394,7 @@ div[data-role="editor-toolbar"] {
 
 }
 
-}
+
 
 .panel.panel-default.panel-heading {
 
@@ -3004,7 +3008,7 @@ div[data-role="editor-toolbar"] {
 
 }
 
-* /Widget-Content */
+/** /Widget-Content *!*/
 
 
 
@@ -3360,7 +3364,7 @@ div[data-role="editor-toolbar"] {
 
 /*-----	map-----*/
 
-* Google maps */
+/** Google maps *!*/
 
 
 
@@ -3528,7 +3532,8 @@ div[data-role="editor-toolbar"] {
 
     box-shadow: none;
 
-    background: url("../img/search-icon.jpg") no-repeat 10px 8px;
+    background: none; 
+/*url("../img/search-icon.jpg") no-repeat 10px 8px;*/
 
     padding:0 5px 0 35px;
 
@@ -3669,8 +3674,7 @@ div[data-role="editor-toolbar"] {
 .state-overview .value h1 {
 
     font-weight: 300;
-
-    font-weight: 30px;
+    
 
 }
 
@@ -3750,7 +3754,8 @@ div[data-role="editor-toolbar"] {
 
 .panel-body.chart-texture {
 
-    background: url("../img/chart-texture.jpg");
+    background: none;
+/*url("../img/chart-texture.jpg");*/
 
     -webkit-border-radius: 4px 4px 0px 0px;
 
@@ -4152,7 +4157,7 @@ div[data-role="editor-toolbar"] {
 
         margin-bottom: -4px;
 
-    };
+    }
 
     }
 
@@ -4432,7 +4437,8 @@ ul.ft-link li a i {
 
     text-indent: -9999px;
 
-    background: url("../img/left-arrow.png") no-repeat;
+    background: none; 
+/*url("../img/left-arrow.png") no-repeat;*/
 
     width: 6px;
 
@@ -4448,7 +4454,8 @@ ul.ft-link li a i {
 
     text-indent: -9999px;
 
-    background: url("../img/right-arrow.png") no-repeat;
+    background: none; 
+/*url("../img/right-arrow.png") no-repeat;*/
 
     width: 6px;
 
@@ -4862,7 +4869,8 @@ ul.ft-link li a i {
 
 .profile-widget-img{
 
-    background: url('../img/backgrounds/bg-11-small.jpg') no-repeat !important;
+    background: none;
+/*url('../img/backgrounds/bg-11-small.jpg') no-repeat !important;
 
 }
 
@@ -5536,7 +5544,8 @@ ul.ft-link li a i {
 
 .weather-bg-img {
 
-    background: url(../img/backgrounds/bg-14-small.jpg) no-repeat center center;
+    background: none;
+/*url(../img/backgrounds/bg-14-small.jpg) no-repeat center center;*/
 
     color: #fff;
 
@@ -8312,9 +8321,11 @@ table.sliders tr td {
 
     width: 80px;
 
-    -webkit-mask: url('../img/mask.png') 0 0 no-repeat;
+    -webkit-mask: none;
+/*url('../img/mask.png') 0 0 no-repeat;*/
 
-    mask: url('../img/mask.png') 0 0 no-repeat;
+    mask: none;
+/*url('../img/mask.png') 0 0 no-repeat;*/
 
     -webkit-user-select: none;
 
@@ -8526,9 +8537,11 @@ table.sliders tr td {
 
     -webkit-border-radius: 6px;
 
-    -webkit-mask: url('../img/mask.png') 0 0 no-repeat;
+    -webkit-mask: none;
+/*url('../img/mask.png') 0 0 no-repeat;*/
 
-    mask: url('../img/mask.png') 0 0 no-repeat;
+    mask: none;
+/*url('../img/mask.png') 0 0 no-repeat;*/
 
 }
 
@@ -8852,7 +8865,8 @@ table.sliders tr td {
 
 .has-js .label_radio {
 
-    background: url(../img/checkbox/radio-off.png) no-repeat;
+    background: none;
+/*url(../img/checkbox/radio-off.png) no-repeat;*/
 
 }
 
@@ -8860,7 +8874,8 @@ table.sliders tr td {
 
 .has-js .label_check {
 
-    background: url(../img/checkbox/check-off.png) no-repeat;
+    background: none;
+/*url(../img/checkbox/check-off.png) no-repeat;*/
 
 }
 
@@ -8868,7 +8883,8 @@ table.sliders tr td {
 
 .has-js label.c_on {
 
-    background: url(../img/checkbox/check-on.png) no-repeat;
+    background: none;
+/*url(../img/checkbox/check-on.png) no-repeat;*/
 
 }
 
@@ -8876,7 +8892,8 @@ table.sliders tr td {
 
 .has-js label.r_on {
 
-    background: url(../img/checkbox/radio-on.png) no-repeat;
+    background: none;
+/*url(../img/checkbox/radio-on.png) no-repeat;*/
 
 }
 
@@ -9008,11 +9025,11 @@ table.sliders tr td {
 
     background: #F5F5F5 !important;
 
-    background: -moz-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;
+    /*background: -moz-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;*/
 
-    background: -webkit-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;
+    /*background: -webkit-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;*/
 
-    background: -o-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;
+    /*background: -o-linear-gradient(center top , #F5F5F5, #F5F5F5) repeat scroll 0 0 #F5F5F5 !important;*/
 
     box-shadow: none;
 
@@ -9866,7 +9883,8 @@ span.customSelect.changed {
 
 .customSelectInner {
 
-    background:url(../img/customSelect-arrow.gif) no-repeat center right;
+    background: none;
+/*url(../img/customSelect-arrow.gif) no-repeat center right;*/
 
 }
 

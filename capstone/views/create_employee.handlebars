@@ -1,0 +1,55 @@
+
+<!--main content start-->
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-files-o"></i> Create Employee Account</h3>
+
+        </div>
+    </div>
+    <!-- Form validations -->
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Employee Details
+                </header>
+                <div class="panel-body">
+                    <div class="form">
+                        <form class="form-validate form-horizontal" id="feedback_form" method="post" action="/create_employee">
+                            <div class="form-group ">
+                                <label for="fname" class="control-label col-lg-2">First Name <span class="required">*</span></label>
+                                <div class="col-lg-10">
+                                    <input class="form-control" id="fname" name="fname" minlength="2" type="text" required />
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="lname" class="control-label col-lg-2">Last Name <span class="required">*</span></label>
+                                <div class="col-lg-10">
+                                    <input class="form-control" id="lname" name="lname" minlength="2" type="text" required />
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="emp_email" class="control-label col-lg-2">E-Mail <span class="required">*</span></label>
+                                <div class="col-lg-10">
+                                    <input class="form-control " id="emp_email" type="email" name="emp_email" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-offset-2 col-lg-10">
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+</section>
+
+<!--main content end-->
