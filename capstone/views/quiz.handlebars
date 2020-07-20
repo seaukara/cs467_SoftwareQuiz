@@ -1,1 +1,60 @@
-This is your quiz
+<h1 align="center">Quiz: {{quiz_name}}</h1>
+
+<h3 align="center"><p id="time_left"></p></h3>
+<br>
+<br>
+<form id="quiz" action="/quiz" method="post">
+  {{#each questions}}
+	  <p>{{question}}</p>
+
+	  {{#each answers}}
+		  <input type="radio" name="{{../question_id}}" value="{{this}}">
+		  <label for="{{this}}">{{this}}</label><br>
+	  {{/each}}
+  <br>
+  {{/each}}
+  <br>
+  <br>
+  <input type="submit" value="Submit">
+</form>
+
+<input type="text" id="timer" value="{{timer}}" hidden>
+
+<script>
+	function SubmitFunction(){
+        document.getElementById('quiz').submit();
+    }
+
+	var quiz_timer = document.getElementById("timer").value * 1000;
+    var finish = new Date().getTime() + quiz_timer;
+
+    setInterval(function(){
+    	
+    	var start = new Date().getTime();
+    	var remaining = finish - start;
+
+   		var days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+  		var hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  		var minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+  		var seconds = Math.floor((remaining % (1000 * 60)) / 1000);   	
+
+  		if (days === 0 && hours != 0){
+  			document.getElementById("time_left").innerHTML = "Time Left: " + hours + "h " + minutes + "m " + seconds + "s";
+  		}
+
+  		else if (days === 0 && hours === 0){
+  			document.getElementById("time_left").innerHTML = "Time Left: " + minutes + "m " + seconds + "s";
+  		}
+
+  		else {
+  			document.getElementById("time_left").innerHTML = "Time Left: " + days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+  		}
+
+  		if (remaining < 0){
+  			document.getElementById("time_left").innerHTML = "EXPIRED"; 
+  		}
+    }, 1000);
+
+    setTimeout(SubmitFunction,quiz_timer);
+ 
+</script>
