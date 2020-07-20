@@ -75,10 +75,10 @@ module.exports = function(){
                 }
 
                 else {
-                	req.session.employee_id = results[0].employer_id;
-					console.log("Employee Session ID: ", req.session.employer_id);
+                	req.session.employee_id = results[0].employee_id;
+					console.log("Employee Session ID: ", req.session.employee_id);
 
-					mysql.pool.query('SELECT quiz_id, quiz_name FROM quiz WHERE access_code=?', req.body.access_code, function(error, results, fields){
+					mysql.pool.query('SELECT quiz_id, quiz_name, timer FROM quiz WHERE access_code=?', req.body.access_code, function(error, results, fields){
 						// log query results
 						console.log("Login Results\n", results);
 
@@ -97,6 +97,7 @@ module.exports = function(){
 			                else{
 								req.session.quiz_id = results[0].quiz_id;
 								req.session.quiz_name = results[0].quiz_name;
+								req.session.timer = results[0].timer;
 								console.log("Quiz Session ID: ", req.session.quiz_id);
 								console.log("Quiz Session Name: ", req.session.quiz_name);
 								res.redirect('/quiz');
