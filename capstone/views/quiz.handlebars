@@ -20,6 +20,7 @@
 
 <input type="text" id="timer" value="{{timer}}" hidden>
 
+
 <script>
 	function SubmitFunction(){
         document.getElementById('quiz').submit();
@@ -28,6 +29,7 @@
 	var quiz_timer = document.getElementById("timer").value * 1000;
     var finish = new Date().getTime() + quiz_timer;
 
+    // Referenced https://www.w3schools.com/howto/howto_js_countdown.asp
     setInterval(function(){
     	
     	var start = new Date().getTime();
