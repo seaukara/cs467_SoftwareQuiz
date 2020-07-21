@@ -8,8 +8,8 @@
 	  <p>{{question}}</p>
 
 	  {{#each answers}}
-		  <input type="radio" name="{{../question_id}}" value="{{this}}">
-		  <label for="{{this}}">{{this}}</label><br>
+		  <input type="radio" name="{{../question_id}}" value="{{this.[1]}}">
+		  <label for="{{this.[0]}}">{{this.[0]}}</label><br>
 	  {{/each}}
   <br>
   {{/each}}
