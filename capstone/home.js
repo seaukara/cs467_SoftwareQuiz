@@ -13,7 +13,7 @@ module.exports = function(){
 		mysql.pool.query('SELECT e.*, employee.* FROM `employer_employee` as e LEFT JOIN employee on employee.employee_id=e.employee_id WHERE employer_id=?',[req.session.employer_id],
 			function (error, employees, fields) {
 				// log query results
-				console.log("Employee List Results\n", employees);
+				// console.log("Employee List Results\n", employees);
 				if(error){
 					res.write(JSON.stringify(error));
 					res.end();
@@ -21,7 +21,7 @@ module.exports = function(){
 					mysql.pool.query('SELECT * FROM `quiz` WHERE employer_id=?',[req.session.employer_id],
 						function (error, quizzes, fields) {
 							// log query results
-							console.log("quizzes List Results\n", quizzes);
+							// console.log("quizzes List Results\n", quizzes);
 							if(error){
 								res.write(JSON.stringify(error));
 								res.end();

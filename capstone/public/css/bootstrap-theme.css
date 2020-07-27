@@ -1554,7 +1554,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 .form-control {
   display: block;
-  width: 100%;
+  width: 90%;
   height: 34px;
   padding: 6px 12px;
   font-size: 14px;
@@ -3136,11 +3136,11 @@ input[type="button"].btn-block {
 [data-toggle="buttons"] > .btn > input[type="checkbox"] {
   display: none;
 }
-.input-group {
-  position: relative;
-  display: table;
-  border-collapse: separate;
-}
+/*.input-group {*/
+/*  position: relative;*/
+/*  display: table;*/
+/*  border-collapse: separate;*/
+/*}*/
 .input-group.col {
   float: none;
   padding-left: 0;

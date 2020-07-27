@@ -23,7 +23,7 @@ app.use('/quiz', require('./quiz.js'));
 app.use('/create_user', require('./create_user.js'));
 app.use('/create_employee', require('./create_employee.js'));
 app.use('/create_quiz', require('./create_quiz.js'));
-
+app.use('/update_quiz', require('./update_quiz.js'));
 
 app.use('/results', require('./results.js'));
 // app.use('/quiz_results', require('./results.js'));

@@ -41,9 +41,9 @@
                         </td>
                         <td>
                             <div class="progress thin">
-                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
+                                <div class="progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
                                 </div>
-                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
+                                <div class="progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
                                 </div>
                             </div>
                             <span class="sr-only">73%</span>
@@ -116,14 +116,19 @@
                         </td>
                         <td>
                             <div class="progress thin">
-                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
+                                <div class="progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
                                 </div>
-                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
+                                <div class="progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
                                 </div>
                             </div>
                             <span class="sr-only">73%</span>
                         </td>
-                        <td> <button class="btn" style='background: transparent;'><img src="static/img/edit.png" style="height:18px; "></button></td>
+                        <td>
+                            <a href="/update_quiz?id={{quiz_id}}" style='background: transparent;'>
+                            <img src="static/img/edit.png" style="height:18px;">
+                            </a>
+                        </td>
+{{!--                            <button class="btn" style='background: transparent;'><img src="static/img/edit.png" style="height:18px; "></button></td>--}}
                         <td>
                             <button type="button" class="btn" style='background: transparent;' data-toggle="modal" data-target="#myModal{{quiz_id}}"}><img src="static/img/delete.png" style="height:18px; "></button>
                         </td>
