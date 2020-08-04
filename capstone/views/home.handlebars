@@ -32,10 +32,14 @@
                 <tbody>
                     {{#each employee}}
                     <tr >
-                        <td><button class="btn btn-info btn-sm"> {{fname}} {{lname}} </button></td>
+                        <td>
+                            <a href="/update_employee?id={{employee_id}}" style='background: transparent;'>
+                            <button class="btn btn-info btn-sm"> {{fname}} {{lname}} </button></td>
+                            </a>
+
                         <td>{{email}}</td>
                         <td>
-                            <a href="/results?employee_id={{employee_id}}" style='background: transparent;'>
+                            <a href="/results/results_employee?employee_id={{employee_id}}" style='background: transparent;'>
                                 <img src="static/img/test.png" style="height:18px;">
                             </a>
                         </td>
@@ -108,9 +112,17 @@
                     {{#each quiz}}
                     <tr>
                         <td>{{quiz_name}}</td>
-                        <td>{{access_code}}</td>
                         <td>
-                            <a href="/results?quiz_id={{quiz_id}}" class="btn" style='background: transparent;'>
+                            {{#if access_code}}
+                                {{access_code}}
+                            {{else}}
+                                <a href="/home/publish_quiz?id={{quiz_id}}">
+                                    <button class="btn btn-info btn-sm" >Publish</button></a>
+                                </a>
+                            {{/if}}
+                        </td>
+                        <td>
+                            <a href="/results/results_quiz?quiz_id={{quiz_id}}" class="btn" style='background: transparent;'>
                                 <img src="static/img/test.png" style="height:18px; ">
                             </a>
                         </td>
@@ -120,6 +132,7 @@
                             <img src="static/img/edit.png" style="height:18px;">
                             </a>
                         </td>
+
 {{!--                            <button class="btn" style='background: transparent;'><img src="static/img/edit.png" style="height:18px; "></button></td>--}}
 
                         <td>

@@ -14,6 +14,7 @@ module.exports = function(){
 
 	router.get('/view_quiz', function(req,res) {
 		console.log('UPDATE!')
+		let mysql = req.app.get('mysql');
 		mysql.pool.query("SELECT * FROM quiz where quiz_id = VALUES ?", req.query.id,function (error, results) {
 			if (error) {
 				res.write(JSON.stringify(error));
@@ -42,14 +43,15 @@ module.exports = function(){
 
 
 
+
 		if (req.body.publish == 'true') {
 
 			for (let i = 1; i <= 12; i++) {
-				var char = Math.floor(Math.random()
-					* str.length + 1);
+				var char = Math.floor(Math.random() * str.length + 1);
 
 				r += str.charAt(char)
 			}
+			r = req.session.employer_id.toString().concat("-", r);
 
 			insert_sql = 'INSERT INTO `quiz`(`quiz_name`, `employer_id`, `timer`, `access_code`) VALUES (?,?,?,?)';
 			val = [req.body.quiz_name, req.session.employer_id, req.body.quiz_time, r];

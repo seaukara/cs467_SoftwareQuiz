@@ -71,5 +71,34 @@ module.exports = function(){
 				}
 			});
 	});
+
+	router.get('/publish_quiz', function(req,res) {
+		let mysql = req.app.get('mysql');
+		let quiz_id = req.query.id;
+		let r = '';
+		var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+			'abcdefghijklmnopqrstuvwxyz0123456789@#$()-';
+
+		for (let i = 1; i <= 12; i++) {
+			var char = Math.floor(
+				Math.random() * str.length + 1);
+
+			r += str.charAt(char)
+		}
+		r = req.session.employer_id.toString().concat("-", r);
+
+		console.log(r);
+		publishQuery = "UPDATE quiz SET access_code = '".concat(r, "' WHERE quiz_id = ").concat(quiz_id);
+		mysql.pool.query(publishQuery,function (error, results) {
+			console.log("Quiz results: ", results);
+			if (error) {
+				res.write(JSON.stringify(error));
+				res.end();
+			} else {
+				res.redirect("/");
+			}
+		});
+
+	});
 	return router;
 }();

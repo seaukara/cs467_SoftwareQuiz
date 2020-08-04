@@ -1,0 +1,103 @@
+
+<script type="text/JavaScript">
+
+    function update() {
+
+    }
+
+
+
+</script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-files-o"></i> Update Quiz</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+
+            <section class="card">
+                <div class="card-header">
+                    Update Employee
+                </div>
+                <div class="card-body">
+                    <form id="employee_form" method="post" action="/update_employee">
+                        <input class="form-control" name="employee_id" value='{{{employee_id}}}' id="employee_id" hidden >
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span style="font-size: inherit" class="input-group-text">First Name</span>
+                            </div>
+                            <input class="form-control" name="fname" value='{{{fname}}}' id="fname" required="" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span style="font-size: inherit" class="input-group-text">Last Name</span>
+                            </div>
+                            <input class="form-control" name="lname" value='{{{lname}}}' id="fname" required="" >
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span style="font-size: inherit" class="input-group-text">Email</span>
+                            </div>
+                            <input class="form-control" name="email" value='{{{email}}}' id="fname" required="" >
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+
+
+                    </form>
+                </div>
+            </section>
+
+{{!--                        <div class="card-body" id="answers" style="margin: 5px; padding: 5px; border: 0.5px solid white;" >--}}
+
+{{!--                        {{#each results}}--}}
+
+{{!--                                    <div class="input-group-append">--}}
+{{!--                                        <input type="button" style="font-size: inherit" class="input-group-text" value="Delete" id="{{{id}}}" onclick="deleteElement(this);">--}}
+{{!--                                    </div>--}}
+
+{{!--                                </div>--}}
+
+{{!--                                {{#each answers}}--}}
+
+{{!--                            <div class="row" style="padding: 10px;">--}}
+{{!--                                        <div class="input-group mb-3">--}}
+{{!--                                            <div class="input-group-prepend">--}}
+{{!--                                                <div class="input-group-text">--}}
+{{!--                                                    {{#if correct}}--}}
+{{!--                                                    <input name="answer_bool_1" id="answer_bool_1" type="checkbox" checked >--}}
+{{!--                                                    <input name="answer_bool_1" id="answer_bool_1" type="hidden" >--}}
+{{!--                                                    {{else}}--}}
+{{!--                                                        <input name="answer_bool_1" id="answer_bool_1" type="checkbox" >--}}
+{{!--                                                        <input name="answer_bool_1" id="answer_bool_1" type="hidden" >--}}
+{{!--                                                    {{/if}}--}}
+{{!--                                                </div>--}}
+{{!--                                            </div>--}}
+{{!--                                            <input class="form-control" value='{{{answer_text}}}' name="answer_text_1" id="AnswerBox_1" required="" >--}}
+{{!--                                            <input type="hidden" value='{{{answer_id}}}' name="answer_id" id="answer_id">--}}
+{{!--                                            <div class="input-group-append">--}}
+{{!--                                                <input type="button" style="font-size: inherit" class="input-group-text" value="Delete Answer" id="{{{id}}}" onclick="deleteAnswer(this)">--}}
+{{!--                                            </div>--}}
+{{!--                                        </div>--}}
+{{!--                                    </div>--}}
+
+{{!--                        {{/each}}--}}
+{{!--                        </div>--}}
+
+{{!--                        <button type="submit" class="btn btn-primary">Update</button>--}}
+{{!--                    </form>--}}
+
+{{!--                </div>--}}
+
+{{!--            </section>--}}
+
+{{!--            <br>--}}
+
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+<!--main content end-->

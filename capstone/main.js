@@ -25,6 +25,7 @@ app.use('/create_employee', require('./create_employee.js'));
 app.use('/create_quiz', require('./create_quiz.js'));
 app.use('/update_question', require('./update_question.js'));
 app.use('/view_quiz', require('./view_quiz.js'));
+app.use('/update_employee', require('./update_employee'));
 
 app.use('/results', require('./results.js'));
 // app.use('/quiz_results', require('./results.js'));
