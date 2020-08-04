@@ -3,20 +3,18 @@ module.exports = function(){
     var express = require('express');
     var router = express.Router();
 
-     // if the user has not logged in, make them do so	
-     router.all('*', function (req, res, next) {
-          if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
-	            console.log("redirect");
-	            console.log(req.session.quiz_id);
-			  	console.log(req.session.quiz_name);
-			  	console.log(req.session.employee_id);
-               	res.redirect('/login')
-          }
-          else {
-               next();
+    /*
+    // if the user has not logged in, make them do so	
+    router.all('*', function (req, res, next) {
+        if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
+        	console.log("redirect");
+           	res.redirect('/login')
+        }
+        else {
+            next();
           }
      });
-
+     */
      // renders initial login page
 	router.get('/', function(req,res){
 		res.render('login');
@@ -90,6 +88,10 @@ module.exports = function(){
 
                 else {
                 	req.session.employee_id = results[0].employee_id;
+                	req.session.employee_fname = results[0].fname;
+                	req.session.employee_lname = results[0].lname;
+                	req.session.employee_email = req.body.employee_email_addr;
+
 					console.log("Employee Session ID: ", req.session.employee_id);
 
 					mysql.pool.query('SELECT quiz_id, quiz_name, timer FROM quiz WHERE access_code=?', req.body.access_code, function(error, results, fields){
