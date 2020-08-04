@@ -2,6 +2,105 @@
 module.exports = function(){
     var express = require('express');
     var router = express.Router();
+    var nodemailer = require('nodemailer');
+
+    // help from https://www.w3schools.com/nodejs/nodejs_email.asp
+    function sendEmail(emailString){
+    	var transporter = nodemailer.createTransport({
+    		service: 'gmail',
+		  	auth: {
+		    	user: 'osu.softwarequiz.2020@gmail.com',
+		   		pass: 'RxwUl8135U0NV4gL'
+		  	}
+		});
+
+    	var mailOptions = {
+			from: 'osu.softwarequiz.2020@gmail.com',
+			to: 'dongbr@oregonstate.edu',
+			subject: 'Sending Email using Node.js',
+			html: emailString
+		};
+
+		transporter.sendMail(mailOptions, function(error, info){
+			if (error) {
+		    	console.log(error);
+		  	} 
+
+		  	else {
+		    	console.log('Email sent: ' + info.response);
+		  	}
+		});
+
+    }
+
+    function checkResults(results, req){
+
+    	var max_correct = results.length;
+    	var correct_count = 0;
+    	const user_answers = Object.keys(req.body);
+    	var answersString = "";
+
+    	for (var i = 0; i < results.length; i++){
+
+    		if (req.body[results[i].question_id] != undefined){
+    			if(parseInt(req.body[results[i].question_id]) === parseInt(results[i].answer_id))
+    			{
+    				correct_count++;
+    				var questionStr = "<h3>" + results[i].question + "</h3>" + "<p>" + results[i].answer_text + "&#9745;</p>";
+    				answersString += questionStr
+    			}
+    		}
+    	}
+
+    	console.log("correct_count: ", correct_count);
+    	console.log("max_correct: ", max_correct);
+
+    	var resultString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " just took Quiz: " + req.session.quiz_name + " and got " 
+    	+ correct_count + "/" + max_correct + " correct!</h1>" + "<p>Contact: " + req.session.employee_email + "</p>";
+    	resultString += answersString;
+    	console.log(resultString);
+    	return resultString;
+    }
+
+
+    function checkUserResults(req, res){
+    	var mysql = req.app.get('mysql');
+    	var query = 'SELECT t1.question_id, answer_id, answer_text FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id'
+		var params = [req.session.quiz_id];
+		mysql.pool.query( query, params, function(error, results, fields) {
+		
+			// log query results
+			console.log("User Results\n", results);
+
+			if(error){
+				res.write(JSON.stringify(error));
+				res.end();
+			}
+
+			else {
+
+				return results;
+
+			    
+		    }
+
+		});
+    }
+
+    function checkMultipleAnswers(results, question_id){
+	var numOfCorrect = 0;
+		for (var i = 0; i < results.length; i++){
+			if (results[i].question_id === question_id){
+				if (results[i].correct === 1){
+					numOfCorrect++;
+					if (numOfCorrect > 1)
+						return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
      // if the user has not logged in, make them do so	
      router.all('*', function (req, res, next) {
@@ -44,14 +143,14 @@ module.exports = function(){
 				var answers_arr = [];
 				var answer_count = 0;
 				var question_count = 0;
-				var current_question_id = 0;
-				for (var i = 0; i < results.length; i++){
-					if (current_question_id === 0)
-						current_question_id = results[i].question_id;
+				var current_question_id = results[0].question_id;
+				var questMultCorrect = checkMultipleAnswers(results, current_question_id);
 
-					else if (current_question_id != results[i].question_id){
-						var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, answers: answers_arr};
+				for (var i = 0; i < results.length; i++){
+					if (current_question_id != results[i].question_id){
+						var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
 						current_question_id = results[i].question_id;
+						questMultCorrect = checkMultipleAnswers(results, current_question_id);
 						answers_arr = [];
 						questions.push(question_answer_obj);
 					}
@@ -63,7 +162,7 @@ module.exports = function(){
 
 				}
 
-				var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, answers: answers_arr};
+				var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
 				questions.push(question_answer_obj);
 
 				console.log("questions", questions);
@@ -102,6 +201,7 @@ module.exports = function(){
 
 			else {
 
+				var queryResults = results;
 				var itr = 0;
 				var correctCount = 0;
 				query = 'INSERT INTO results (quiz_id, question_id, employee_id, correct_question_id, selected_question_id) VALUES ?';
@@ -119,8 +219,9 @@ module.exports = function(){
 							params.push([String(quiz_id), String(question_id),String(employee_id), String(correct_answer_id), String(user_selection)]);
 						}
 					}
-					
 				}
+
+
 				console.log("params", params);
 
 				mysql.pool.query(query, [params], function(error,results,fields){
@@ -129,6 +230,10 @@ module.exports = function(){
 						res.end();
 					}
 					else {
+						
+						sendEmail(checkResults(queryResults,req));
+						// checkUserResults(req, res);
+
 						req.session.destroy();
   						res.render('login', context);
 					}
