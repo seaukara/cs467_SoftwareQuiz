@@ -12,7 +12,7 @@ module.exports = function(){
 		}
 	});
 
-	router.get('/update_quiz', function(req,res) {
+	router.get('/view_quiz', function(req,res) {
 		console.log('UPDATE!')
 		mysql.pool.query("SELECT * FROM quiz where quiz_id = VALUES ?", req.query.id,function (error, results) {
 			if (error) {
@@ -20,7 +20,7 @@ module.exports = function(){
 				res.end();
 			} else {
 				console.log("quiz_details: ", results);
-				res.render('/update_quiz', {
+				res.render('/view_quiz', {
 					'quiz_name': results.quiz_name
 				});
 			}
@@ -32,7 +32,7 @@ module.exports = function(){
 		let question_idx = {};
 
 		let mysql = req.app.get('mysql');
-		console.log("req.body= ", req.body);
+		// console.log("req.body= ", req.body);
 		let r = '';
 		let insert_sql = null;
 		let val = [];
@@ -106,21 +106,30 @@ module.exports = function(){
 										if (req.body["question_text_".concat(idx)] != '' && req.body['answer_text_'.concat(idx)]) {
 											// if ('answer_text_'.concat(idx))
 											let answers = req.body['answer_text_'.concat(idx)];
+											console.log("answers");
 											let correct = req.body['answer_bool_'.concat(idx)];
 											let i = 0;
-											for (i; i < answers.length; i++) {
-												if (answers[i] != '') {
-													if (correct[i] == "on") {
-														c = 1;
-														let s = i + 1;
-														correct.splice(s, 1);
-													} else {
-														c = 0;
-													}
-													options.push([question_id, answers[i], c]);
+											if (typeof(answers) == 'string') {
+												if (typeof(correct) == 'string') {
+													options.push([question_id, answers, 0]);
+												} else {
+													options.push([question_id, answers, 1]);
 												}
+											} else {
+												for (i; i < answers.length; i++) {
+													if (answers[i] != '') {
+														if (correct[i] == "on") {
+															c = 1;
+															let s = i + 1;
+															correct.splice(s, 1);
+														} else {
+															c = 0;
+														}
+														options.push([question_id, answers[i], c]);
+													}
+												}
+												question_id++;
 											}
-											question_id++;
 										}
 									}
 									if (options.length > 0) {

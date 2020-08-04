@@ -1,0 +1,107 @@
+
+<script type="text/JavaScript">
+    function updateQuestion(div) {
+
+
+    }
+    function deleteAnswer(div) {
+        console.log("delete div = ", div);
+        div.parentNode.parentNode.parentNode.remove();
+    }
+    function newAnswer(div) {
+
+        let f = document.getElementById("newform")
+        let answers = f.children[1];
+        let newAnswer = document.createElement('div');
+        newAnswer.style = "padding: 10px;";
+        newAnswer.className = "row";
+        let inner = "<div class='input-group mb-3'><div class='input-group-prepend'> <div class='input-group-text'> <input name='answer_bool_1' id='answer_bool_1' type='checkbox'> <input name= 'answer_bool_1' id= 'answer_bool_1' type='hidden'> </div> </div> <input class='form-control' value='' name='answer_text_1' id='AnswerBox_1' required=''> <input type='hidden' value='' name='answer_id' id='answer_id'>    <div class='input-group-append'>\n" +
+                "                <input type='button' style='font-size: inherit' class='input-group-text' value='Delete Answer' id='' onclick='deleteAnswer(this)'>\n" +
+                "                </div></div>"
+        newAnswer.innerHTML = inner;
+        answers.appendChild(newAnswer);
+
+    }
+
+
+</script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-files-o"></i> Update Quiz</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+
+            <section class="card">
+                <div class="card-header">
+                    Update Question
+{{!--                    <input class="btn btn-info btn-med" style="float:right" type="button" value="+" onclick="createNewElement();">--}}
+                </div>
+                <div id="newElementId" class="card-body">
+                    <form id="newform" method="post" action="/update_question">
+{{!--                        <div class="row" id="Question_{{{}}}">--}}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span id="Q_ID" style="font-size: inherit" class="input-group-text">Question</span>
+
+                        </div>
+
+                        <input class="form-control" name="{{{question_id}}}" value='{{{question}}}' id="QuestionBox_{{{question_id}}}" required="" >
+                        <div class="input-group-append">
+                            <input type="button" style="font-size: inherit" class="input-group-text" value="Add Answer" id="{{{id}}}" onclick="newAnswer()">
+                        </div>
+                    </div>
+                        <div class="card-body" id="answers" style="margin: 5px; padding: 5px; border: 0.5px solid white;" >
+
+                        {{#each results}}
+
+{{!--                                    <div class="input-group-append">--}}
+{{!--                                        <input type="button" style="font-size: inherit" class="input-group-text" value="Delete" id="{{{id}}}" onclick="deleteElement(this);">--}}
+{{!--                                    </div>--}}
+
+{{!--                                </div>--}}
+
+{{!--                                {{#each answers}}--}}
+
+                            <div class="row" style="padding: 10px;">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    {{#if correct}}
+                                                    <input name="answer_bool_1" id="answer_bool_1" type="checkbox" checked >
+                                                    <input name="answer_bool_1" id="answer_bool_1" type="hidden" >
+                                                    {{else}}
+                                                        <input name="answer_bool_1" id="answer_bool_1" type="checkbox" >
+                                                        <input name="answer_bool_1" id="answer_bool_1" type="hidden" >
+                                                    {{/if}}
+                                                </div>
+                                            </div>
+                                            <input class="form-control" value='{{{answer_text}}}' name="answer_text_1" id="AnswerBox_1" required="" >
+                                            <input type="hidden" value='{{{answer_id}}}' name="answer_id" id="answer_id">
+                                            <div class="input-group-append">
+                                                <input type="button" style="font-size: inherit" class="input-group-text" value="Delete Answer" id="{{{id}}}" onclick="deleteAnswer(this)">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                        {{/each}}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+
+                </div>
+
+            </section>
+
+            <br>
+        </div>
+
+    </div>
+
+    <!-- page end-->
+
+
+<!--main content end-->

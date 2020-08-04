@@ -1,0 +1,191 @@
+
+<script type="text/JavaScript">
+
+    function insertQuestion() {
+        // let mysql = req.app.get('mysql');
+        document.getElementById("outer").submit();
+
+    }
+
+
+    function createNewElement() {
+        // let insertForm = document.createElement('form');
+        // insertForm.id = "insertForm";
+        document.getElementById('newQButton').disabled = true;
+        let c = 0;
+        let outer = document.createElement('form');
+        outer.id = "outer";
+        outer.method="post";
+        outer.action="/view_quiz";
+        document.getElementById("newQuestion").appendChild(outer);
+        let question_div = document.createElement('div');
+        question_div.className = "row";
+        document.getElementById('outer').style["background"]= "#d3d3d33d";
+        document.getElementById('outer').style["border"] = "lightgrey thin solid";
+        document.getElementById('outer').style["padding"]= "30px";
+        document.getElementById('outer').style["margin-bottom"]= "10px";
+
+        document.getElementById("outer").appendChild(question_div);
+        let count = document.getElementById("newform").childElementCount;
+
+        question_div.id = "Question_".concat(parseInt(count)+parseInt(c));
+
+        let question = document.createElement('div');
+        question.className = "input-group mb-3"
+
+        question.innerHTML = "<div class='input-group-prepend'> <span id='Q_ID' style='font-size: inherit' class='input-group-text'>Question ".concat(count, "</span> </div>");
+
+        let questionBox = document.createElement('input');
+        questionBox.className = "form-control";
+        questionBox.name = "newquestion";
+
+        questionBox.id = "QuestionBox_".concat(count);
+        questionBox.required = true;
+        question.appendChild(questionBox);
+        let deleteButton = document.createElement('div');
+        deleteButton.className = "input-group-append";
+        deleteButton.innerHTML = "<input type='button' style='font-size: inherit' class='input-group-text' value='Delete' id=".concat(count, " onclick='deleteNewQuestion(this);'>");
+        question.appendChild(deleteButton);
+        let answers_div = document.createElement('div')
+
+        answers_div.className = "card-body";
+        answers_div.style = "margin:5px; padding:5px;border:none";
+        answers_div.id = 'answers_'.concat(count);
+        // answers_div.name = "answers";
+        let addAnswer = document.createElement('div');
+        addAnswer.className = "input-group-append";
+        addAnswer.innerHTML = "<input type='button' style='font-size: inherit' class='input-group-text' value='Add Answer' id=".concat(count, " onclick='newAnswer(this);'>");
+        question.appendChild(addAnswer);
+
+        question_div.appendChild(question);
+        question_div.appendChild(answers_div);
+        document.getElementById('outer').innerHTML = document.getElementById('outer').innerHTML.concat('<button type="submit" class="btn btn-primary" onclick="insertQuestion()">Save Question</button>');
+    }
+    function deleteNewQuestion(div) {
+        document.getElementById('newQButton').disabled = false;
+        //console.log(div.parentNode.parentNode.parentNode);
+        div.parentNode.parentNode.parentNode.parentNode.remove();
+
+    }
+
+    function newAnswer(div) {
+        let c = document.getElementById("answers_".concat(document.getElementById("newform").childElementCount)).childElementCount;
+        // console.log("div=", div.id);
+        let q_count = 1;
+        div = document.getElementById("answers_".concat(div.id))
+        // console.log("ans count = ", div.childElementCount);
+        // console.log("ans count-2 = ", div.childElementCount-2);
+        let answerCard = document.createElement('div');
+        answerCard.className = "row";
+        answerCard.style['padding'] = "10px"
+
+
+        let answer_opt = document.createElement('div');
+        answer_opt.className = "input-group mb-3";
+        answer_opt.value = 0;
+        let check_text = "<input name='answer_bool_".concat(q_count, "' id='answer_bool_").concat(q_count, "' type='checkbox'/>");
+        check_text = check_text.concat("<input name='answer_bool_".concat(q_count, "' id='answer_bool_").concat(q_count, "' type='hidden'/>"));
+        answer_opt.innerHTML = "<div class='input-group-prepend' ><div class='input-group-text'>".concat(check_text, "</div></div>");
+
+        let answerBox = document.createElement('input');
+        answerBox.className = "form-control";
+        answerBox.name = "answer_text_".concat(q_count);
+        // answerBox.type = 'text';
+        answerBox.id = "AnswerBox_".concat(q_count);
+        if (q_count == 1) {
+            answerBox.required = true;
+        }
+        answer_opt.appendChild(answerBox);
+
+
+        answerCard.appendChild(answer_opt);
+        div.appendChild(answerCard);
+        // console.log(div);
+    }
+
+
+</script>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="page-header"><i class="fa fa-files-o"></i> View/Edit {{{quiz_name}}}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+{{!--            <form id="quiz_form" method="post" action="/update_question">--}}
+
+            <section class="card">
+                <div class="card-header">
+                    New Question
+                    <input id="newQButton" class="btn btn-info btn-med" style="float:right" type="button"value="+" onclick="createNewElement();">
+                </div>
+                <div id="newElementId" class="card-body">
+                    <div id="newform" >
+
+                        {{#each questions}}
+                            <div class="row" id="Question_{{{id}}}">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span id="Q_ID" class="input-group-text">Question {{id}}</span>
+                                    </div>
+                                    <input class="form-control" name="question_text_{{{id}}}" value='{{{question}}}' id="QuestionBox_{{{id}}}" required="" disabled>
+                                    <div class="input-group-append">
+                                        <a href="/view_quiz/delete?id={{question_id}}">
+                                            <input type="button" class="input-group-text" value="Delete" id="{{{id}}}">
+                                        </a>
+                                        <a href="/update_question?id={{question_id}}">
+                                        {{!--                                            <input type="button" value="Visit Google" />--}}
+
+                                        <input type="button" class="input-group-text" value="Edit" id="{{{id}}}">
+                                        </a>
+
+                                    </div>
+
+                                </div>
+                            <div class="card-body" id="answers_{{{id}}}" style="margin: 5px; padding: 5px; border: 0.5px solid white;" >
+
+                                    {{#each answers}}
+
+
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    {{#if val}}
+                                                    <input name="answer_bool_1" id="answer_bool_1" type="checkbox" checked disabled>
+                                                    <input name="answer_bool_1" id="answer_bool_1" type="hidden" disabled>
+                                                    {{else}}
+                                                        <input name="answer_bool_1" id="answer_bool_1" type="checkbox" disabled>
+                                                        <input name="answer_bool_1" id="answer_bool_1" type="hidden" disabled>
+                                                    {{/if}}
+                                                </div>
+                                            </div>
+                                            <input class="form-control" value='{{{text}}}' name="answer_text_1" id="AnswerBox_1" required="" disabled>
+                                        </div>
+
+                                {{/each}}
+
+                            </div>
+                            </div>
+                        {{/each}}
+                        <div id="newQuestion">
+                        </div>
+                        </div>
+{{!--                    </>--}}
+                </div>
+
+
+            </section>
+            <br>
+{{!--            <button value="Submit" class="btn btn-primary" onclick="saveForm()">Save & Finish Later</button>--}}
+{{!--            <button value="Submit" class="btn btn-primary" onclick="publishForm()">Publish Quiz</button>--}}
+
+        </div>
+    </div>
+
+    </div>
+
+    <!-- page end-->
+
+
+<!--main content end-->

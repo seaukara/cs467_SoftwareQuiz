@@ -2214,13 +2214,15 @@ div[data-role="editor-toolbar"] {
 
   letter-spacing: 0;
 
+
+
 }
 
 .panel .panel-heading .panel-actions {
 
   float: right;
 
-  margin-right: -15px;
+  /*margin-right: -15px;*/
 
   height: 40px;
 

@@ -8,7 +8,7 @@
     <div class="col-lg-12">
         {{!--Employee table start--}}
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading" style="padding:10px;">
                 <h2> <strong> Employees </strong> </h2>
                 <div class="panel-actions">
                     <a href="create_employee">
@@ -22,16 +22,16 @@
                 <table class="table bootstrap-datatable countries">
                     <thead>
                     <tr>
-                        <th>Employee Name</th>
-                        <th>Email</th>
-                        <th>Results</th>
-                        <th>Performance</th>
-                        <th>Delete</th>
+                        <th >Employee Name</th>
+                        <th >Email</th>
+                        <th style="width:10%">Results</th>
+                        <th style="width:35%">Performance</th>
+                        <th style="width:10%">Delete</th>
                     </tr>
                     </thead>
                 <tbody>
                     {{#each employee}}
-                    <tr>
+                    <tr >
                         <td><button class="btn btn-info btn-sm"> {{fname}} {{lname}} </button></td>
                         <td>{{email}}</td>
                         <td>
@@ -82,11 +82,11 @@
         <br>
         {{!--Quiz table start--}}
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading" style="padding:10px;">
                 <h2><strong>Quizzes</strong></h2>
                 <div class="panel-actions">
                     <a href="create_quiz">
-                        <button class="btn btn-info btn-sm" style="margin-right:5px">
+                        <button class="btn btn-info btn-sm">
                             <span style="font-weight:400; line-height:0px">Create Quiz</span>
                         </button>
                     </a>
@@ -96,12 +96,12 @@
                 <table class="table bootstrap-datatable countries">
                     <thead>
                     <tr>
-                        <th>Quiz</th>
-                        <th>Access Code</th>
-                        <th>Results</th>
-                        <th>Performance</th>
-                        <th>Edit Quiz</th>
-                        <th>Delete</th>
+                        <th >Quiz</th>
+                        <th >Access Code</th>
+                        <th style="width:10%">Results</th>
+                        <th style="width:10%; text-align: center">View/Edit</th>
+                        <th style="width:30%">Performance</th>
+                        <th style="width:10%; text-align: center">Delete</th>
                     </tr>
                     </thead>
                 <tbody>
@@ -114,6 +114,14 @@
                                 <img src="static/img/test.png" style="height:18px; ">
                             </a>
                         </td>
+
+                        <td style="text-align:center">
+                            <a href="/view_quiz?id={{quiz_id}}" style='background: transparent; text-align:center'>
+                            <img src="static/img/edit.png" style="height:18px;">
+                            </a>
+                        </td>
+{{!--                            <button class="btn" style='background: transparent;'><img src="static/img/edit.png" style="height:18px; "></button></td>--}}
+
                         <td>
                             <div class="progress thin">
                                 <div class="progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
@@ -123,13 +131,7 @@
                             </div>
                             <span class="sr-only">73%</span>
                         </td>
-                        <td>
-                            <a href="/update_quiz?id={{quiz_id}}" style='background: transparent;'>
-                            <img src="static/img/edit.png" style="height:18px;">
-                            </a>
-                        </td>
-{{!--                            <button class="btn" style='background: transparent;'><img src="static/img/edit.png" style="height:18px; "></button></td>--}}
-                        <td>
+                        <td style="text-align: center">
                             <button type="button" class="btn" style='background: transparent;' data-toggle="modal" data-target="#myModal{{quiz_id}}"}><img src="static/img/delete.png" style="height:18px; "></button>
                         </td>
                     </tr>
@@ -139,11 +141,12 @@
                             <div class="modal-dialog">
                                 <!-- Modal content-->
                                 <div class="modal-content">
-                                    <div style="font-size:20px" class="modal-header">
+                                    <div style="padding:3px; padding-right:3px;font-size:20px" class="modal-header">
                                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <p>Are you sure you would like to delete this quiz?</p>
+
                                     </div>
                                     <div class="modal-body">
+                                        <p>Are you sure you would like to delete this quiz?</p>
                                         <a href="home/delete_quiz?id={{quiz_id}}">
                                         <button class="btn btn-info btn-lg" >OK</button></a>
                                         </a>

@@ -3,7 +3,8 @@ module.exports = function(){
     var express = require('express');
     var router = express.Router();
 
-     // if the user has not logged in, make them do so	
+     //TODO: quiz_id and quiz_name shouldn't necessarily be defined in order to be logged in.
+     // if the user has not logged in, make them do so
      router.all('*', function (req, res, next) {
           if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
 	            console.log("redirect");
