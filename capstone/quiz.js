@@ -5,7 +5,7 @@ module.exports = function(){
     var nodemailer = require('nodemailer');
 
     // help from https://www.w3schools.com/nodejs/nodejs_email.asp
-    function sendEmail(emailString){
+    function sendEmail(emailString, userEmail, fname, lname, quiz_name){
     	var transporter = nodemailer.createTransport({
     		service: 'gmail',
 		  	auth: {
@@ -16,8 +16,8 @@ module.exports = function(){
 
     	var mailOptions = {
 			from: 'osu.softwarequiz.2020@gmail.com',
-			to: 'dongbr@oregonstate.edu',
-			subject: 'Sending Email using Node.js',
+			to: userEmail,
+			subject: fname + ' ' + lname + ': ' + quiz_name + ' quiz',
 			html: emailString
 		};
 
@@ -33,45 +33,16 @@ module.exports = function(){
 
     }
 
-    function checkResults(results, req){
 
-    	var max_correct = results.length;
-    	var correct_count = 0;
-    	const user_answers = Object.keys(req.body);
-    	var answersString = "";
-
-    	for (var i = 0; i < results.length; i++){
-
-    		if (req.body[results[i].question_id] != undefined){
-    			if(parseInt(req.body[results[i].question_id]) === parseInt(results[i].answer_id))
-    			{
-    				correct_count++;
-    				var questionStr = "<h3>" + results[i].question + "</h3>" + "<p>" + results[i].answer_text + "&#9745;</p>";
-    				answersString += questionStr
-    			}
-    		}
-    	}
-
-    	console.log("correct_count: ", correct_count);
-    	console.log("max_correct: ", max_correct);
-
-    	var resultString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " just took Quiz: " + req.session.quiz_name + " and got " 
-    	+ correct_count + "/" + max_correct + " correct!</h1>" + "<p>Contact: " + req.session.employee_email + "</p>";
-    	resultString += answersString;
-    	console.log(resultString);
-    	return resultString;
-    }
-
-
-    function checkUserResults(req, res){
+    function checkUserAnswers(req, res, fname, lname, quiz_name){
     	var mysql = req.app.get('mysql');
-    	var query = 'SELECT t1.question_id, answer_id, answer_text FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id'
+    	var query = 'SELECT t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id'
 		var params = [req.session.quiz_id];
 		mysql.pool.query( query, params, function(error, results, fields) {
 		
 			// log query results
 			console.log("User Results\n", results);
-
+			console.log("length", results.length);
 			if(error){
 				res.write(JSON.stringify(error));
 				res.end();
@@ -79,7 +50,89 @@ module.exports = function(){
 
 			else {
 
-				return results;
+				var max_correct = 0;
+		    	var correct_count = 0;
+		    	const user_answers = Object.keys(req.body);
+		    	for (var i = 0; i < results.length; i++){
+		    		if (results[i].correct === 1)
+		    			max_correct++;
+		    	}
+
+		    	var curr_id = results[0].question_id;
+				var emailStringObj = {};
+				var answerStringObj = {};
+				emailStringObj[curr_id] = "<h3>" + results[0].question + "</h3>";
+
+				for (var i = 1; i < results.length; i++){
+					if (results[i].question_id != curr_id){
+				    	curr_id = results[i].question_id;
+				      	emailStringObj[curr_id] = "<h3>" + results[i].question + "</h3>";
+				    }
+				}
+
+				for (var i = 0; i < results.length; i++){
+					var userSelectedQuest = false;
+					var curr_id = results[i].question_id;
+					if (req.body[curr_id] != undefined){
+					
+						if (typeof(req.body[curr_id]) === 'string'){
+						  	if (parseInt(req.body[curr_id]) === results[i].answer_id){
+						   	 	if (results[i].correct === 1){
+						      		var answerString = "<p>" + results[i].answer_text + "<span style='color:MediumSeaGreen;'> &#9745; </span></p>";
+						      		emailStringObj[curr_id] += answerString;
+						      		correct_count++;
+						    	}
+
+						    	else {
+						      		var answerString = "<p>" + results[i].answer_text + "<span style='color:Tomato;'> &#9746; </span></p>";
+						      		emailStringObj[curr_id] += answerString;
+						    	}
+						    
+						    	answerStringObj[results[i].answer_id] = true;
+						  	}
+						}
+
+						else {
+					  		for (var j = 0; j < req.body[curr_id].length; j++){
+					    	
+						    	if (parseInt(req.body[curr_id][j]) === results[i].answer_id){
+						      		if (results[i].correct === 1){
+						        		var answerString = "<p>" + results[i].answer_text + "<span style='color:MediumSeaGreen;'> &#9745; </span></p>";
+						        		emailStringObj[curr_id] += answerString;
+						        		correct_count++;
+						      		}
+					     	
+							     	else {
+							        	var answerString = "<p>" + results[i].answer_text + "<span style='color:Tomato;'> &#9746; </span></p>";
+							        	emailStringObj[curr_id] += answerString;
+							      	}
+					      			answerStringObj[results[i].answer_id] = true;
+					    		}
+					  		}
+						}	
+
+						if (answerStringObj[results[i].answer_id] === undefined){ 
+						  	var answerString = "<p>" + results[i].answer_text + "</p>";
+						  	emailStringObj[curr_id] += answerString;
+						  
+						}
+					}
+				}
+				
+				var emailString = "<h1>" + fname + " " + lname + " has just taken the " 
+									+ quiz_name + " quiz! " + fname + " got " + correct_count 
+									+ " out of " + max_correct + " correct. Below are the results!</h1>";
+				/* Object.entries unsupported on node version 6
+				for (const [key, value] of Object.entries(emailStringObj)){
+					emailString += `${value}`;
+				}
+				*/
+				for (const property in emailStringObj){
+					emailString += `${emailStringObj[property]}`;
+				}
+				console.log(emailStringObj);
+				console.log(emailString);
+				sendEmail(emailString, 'dongbr@oregonstate.edu', fname, lname, quiz_name);
 
 			    
 		    }
@@ -188,6 +241,15 @@ module.exports = function(){
   		console.log(user_answers);
   		context.quiz_finished = true;
 
+		// If the user did not submit any answers
+		if (req.body.length === 0){
+			var emailString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " submitted a blank quiz </h1>";
+			sendEmail(emailString, 'dongbr@oregonstate.edu', req.session.employee_fname, req.session.employee_lname, req.session.quiz_name);
+
+			req.session.destroy();
+			res.render('login', context);
+		}
+
   		var query = 'SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id WHERE answers.correct = 1';
   		mysql.pool.query(query, [req.session.quiz_id],
 			function (error, results, fields) {
@@ -201,24 +263,55 @@ module.exports = function(){
 
 			else {
 
-				var queryResults = results;
-				var itr = 0;
-				var correctCount = 0;
+
+
+				// Otherwise...
+				/*
+					We know begin to store the results of the user selections from their quiz.
+					At first we build the general SQL format of an INSERT operation.
+					Then we go through the questions they have answered and check it with all the correct answers to these questions.
+					We have a checked_quest array that tells us if we have looked at a question and cross checked it with a user's selection
+					If that question has not been checked yet then we go about building the INSERT SQL command via the params array
+					which will hold all the values of our INSERT operation.	
+
+					Note the user submission info comes in the form of an object of arrays (i.e. req.body). That is, some questions that users
+					will answer will have multiple answers. We must parse through these arrays to store their selecions.
+
+					Recall, user_answers are the keys to the object of req.body
+				*/
 				query = 'INSERT INTO results (quiz_id, question_id, employee_id, correct_question_id, selected_question_id) VALUES ?';
 				var params = [];
 				var quiz_id = req.session.quiz_id;
 				var employee_id = req.session.employee_id;
 
+				var checked_quest = [];
+
+
 				for (var i = 0; i < user_answers.length; i++){
-					for (var j = 0; j < results.length; j++){
-						if (parseInt(user_answers[i]) === results[j].question_id){
+					for (var j = 0; j < results.length; j++)
+					{
+						if (checked_quest[results[j].question_id] === undefined && parseInt(user_answers[i]) === results[j].question_id){
+							
 							var question_id = results[j].question_id;
 							var correct_answer_id = results[j].answer_id;
-							var user_selection = req.body[user_answers[i]];
+							
+							if (typeof(req.body[user_answers[i]]) === 'string'){
+								var user_selection = req.body[user_answers[i]];
+								params.push([String(quiz_id), String(question_id), String(employee_id), String(correct_answer_id), String(user_selection)]);
+							}
+							else {
+								for (var k = 0; k < req.body[user_answers[i]].length; k++){
+									var user_selection = req.body[user_answers[i]][k];
+									params.push([String(quiz_id), String(question_id), String(employee_id), String(correct_answer_id), String(user_selection)]);
+								}
+							}
 
-							params.push([String(quiz_id), String(question_id),String(employee_id), String(correct_answer_id), String(user_selection)]);
+							// Mark that we checked this question_id and we do not need to check it again.
+							checked_quest[results[j].question_id] = true;
 						}
+
 					}
+
 				}
 
 
@@ -230,10 +323,8 @@ module.exports = function(){
 						res.end();
 					}
 					else {
-						
-						sendEmail(checkResults(queryResults,req));
-						// checkUserResults(req, res);
 
+						checkUserAnswers(req,res, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name);
 						req.session.destroy();
   						res.render('login', context);
 					}
