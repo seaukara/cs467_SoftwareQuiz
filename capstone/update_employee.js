@@ -17,7 +17,9 @@ module.exports = function(){
 					res.write(JSON.stringify(error));
 					res.end();
 				} else {
-					results = Object.values(JSON.parse(JSON.stringify(results)))
+					// results = Object.values(JSON.parse(JSON.stringify(results)))
+					results = JSON.parse(JSON.stringify(results));
+
 					console.log("results=", results);
 
 					res.render("update_employee", {

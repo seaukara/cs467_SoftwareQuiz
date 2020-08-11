@@ -22,7 +22,9 @@ module.exports = function(){
                 let copy = JSON.stringify(results);
                 console.log(typeof(copy));
                 console.log(JSON.stringify(results));
-                results = Object.values(JSON.parse(JSON.stringify(results)))
+                // results = Object.values(JSON.parse(JSON.stringify(results)))
+                results = JSON.parse(JSON.stringify(results));
+
                 // console.log("results = ", results);
                 for (let i = 0; i < results.length; i++) {
                     if (results[i].correct == 1) {
@@ -94,8 +96,9 @@ module.exports = function(){
                             res.write(JSON.stringify(error));
                             res.end();
                         } else {
-                            quizzes = Object.values(JSON.parse(JSON.stringify(quizzes)))
-                            console.log("QUIZZWS", quizzes);
+                            // quizzes = Object.values(JSON.parse(JSON.stringify(quizzes)))
+                            quizzes = JSON.parse(JSON.stringify(quizzes));
+
                             res.render('quiz_results', {
                                 quiz_id: req.query.quiz_id,
                                 quiz_name: results[0]['quiz_name'],

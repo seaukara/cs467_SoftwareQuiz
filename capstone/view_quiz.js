@@ -25,7 +25,9 @@ module.exports = function(){
 							res.end();
 						} else {
 
-							details = Object.values(JSON.parse(JSON.stringify(details)))
+							// details = Object.values(JSON.parse(JSON.stringify(details)))
+							details = JSON.parse(JSON.stringify(details));
+
 							let questions = {};
 
 							let cur = null;
