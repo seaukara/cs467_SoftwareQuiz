@@ -9,14 +9,15 @@ module.exports = function(){
 			res.redirect('/');
 		}
 		let mysql = req.app.get('mysql');
-		let q = "SELECT e.*, employee.*, percent, total, total_correct FROM `employer_employee` as e LEFT JOIN employee on employee.employee_id=e.employee_id JOIN ( SELECT employee_id, SUM(IF(correct_question_id=selected_question_id, 1, 0)) as total_correct, COUNT(result_id) as total, ROUND(SUM(IF(correct_question_id=selected_question_id, 1, 0)) / COUNT(result_id) * 100, 0) AS percent FROM `results` GROUP BY employee_id) r ON r.employee_id = e.employee_id WHERE `e`.employer_id=?"
+		let q = "SELECT e.*, employee.*, IFNULL(percent, 0) as percent, IFNULL(total, 0) as total, IFNULL(total_correct, 0) as total_correct FROM `employer_employee` as e LEFT JOIN employee on employee.employee_id=e.employee_id LEFT JOIN ( SELECT employee_id, SUM(IF(correct_question_id=selected_question_id, 1, 0)) as total_correct, COUNT(result_id) as total, ROUND(SUM(IF(correct_question_id=selected_question_id, 1, 0)) / COUNT(result_id) * 100, 0) AS percent FROM `results` GROUP BY employee_id) r ON r.employee_id = e.employee_id WHERE `e`.employer_id=?"
 		mysql.pool.query(q,[req.session.employer_id],
 			function (error, employees, fields) {
 				if(error){
 					res.write(JSON.stringify(error));
 					res.end();
 				} else {
-					mysql.pool.query('SELECT quiz.*, ROUND(SUM(score.corrected_score)/COUNT(score.question_id)*100, 2) as score FROM `quiz` JOIN (SELECT scores.quiz_id, answers.question_id, SUM(correct) as num_correct_answers, 1/ SUM(correct) as answer_value, scores.correct_count, scores.attempt_count, scores.correct_count/scores.attempt_count as score, (scores.correct_count/scores.attempt_count)*(1/ SUM(correct)) as corrected_score FROM `answers` JOIN (SELECT results.quiz_id, question_id, SUM(IF(selected_question_id=correct_question_id, 1, 0)) as correct_count, COUNT(result_id) as attempt_count FROM `results` JOIN `quiz` ON quiz.quiz_id=results.quiz_id WHERE quiz.employer_id=? GROUP BY question_id) scores ON scores.question_id=answers.question_id GROUP BY question_id) score ON score.quiz_id=quiz.quiz_id WHERE employer_id=? GROUP BY quiz.quiz_id',[req.session.employer_id, req.session.employer_id],
+					console.log("employees=", employees)
+					mysql.pool.query('SELECT quiz.*, ROUND(SUM(score.corrected_score)/COUNT(score.question_id)*100, 2) as score FROM `quiz` LEFT JOIN (SELECT scores.quiz_id, answers.question_id, SUM(correct) as num_correct_answers, 1/ SUM(correct) as answer_value, scores.correct_count, scores.attempt_count, scores.correct_count/scores.attempt_count as score, (scores.correct_count/scores.attempt_count)*(1/ SUM(correct)) as corrected_score FROM `answers` JOIN (SELECT results.quiz_id, question_id, SUM(IF(selected_question_id=correct_question_id, 1, 0)) as correct_count, COUNT(result_id) as attempt_count FROM `results` JOIN `quiz` ON quiz.quiz_id=results.quiz_id WHERE quiz.employer_id=? GROUP BY question_id) scores ON scores.question_id=answers.question_id GROUP BY question_id) score ON score.quiz_id=quiz.quiz_id WHERE employer_id=? GROUP BY quiz.quiz_id',[req.session.employer_id, req.session.employer_id],
 						function (error, quizzes) {
 							if(error){
 								res.write(JSON.stringify(error));
