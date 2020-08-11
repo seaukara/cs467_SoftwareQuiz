@@ -34,7 +34,7 @@ module.exports = function(){
     }
 
 
-    function checkUserAnswers(req, res, fname, lname, quiz_name){
+    function checkUserAnswers(req, res, fname, lname, quiz_name, quiz_id){
     	var mysql = req.app.get('mysql');
     	var query = 'SELECT t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id'
 		var params = [req.session.quiz_id];
@@ -132,10 +132,32 @@ module.exports = function(){
 				}
 				console.log(emailStringObj);
 				console.log(emailString);
-				sendEmail(emailString, 'dongbr@oregonstate.edu', fname, lname, quiz_name);
+				get_and_send_email(req, res, emailString, fname, lname, quiz_name, quiz_id);
 
 			    
 		    }
+
+		});
+    }
+
+    function get_and_send_email(req, res, emailString, fname, lname, quiz_name, quiz_id){
+    	var mysql = req.app.get('mysql');
+    	var query = 'SELECT email FROM quiz INNER JOIN employer ON quiz.employer_id = employer.employer_id WHERE quiz_id=?'
+    	var params = [quiz_id];
+    	mysql.pool.query( query, params, function(error, results, fields) {
+		
+			// log query results
+			console.log("Results\n", results);
+			if(error){
+				res.write(JSON.stringify(error));
+				res.end();
+			}
+
+			else {
+				var employer_email = results[0].email;
+				sendEmail(emailString, employer_email, fname, lname, quiz_name);
+			}
+
 
 		});
     }
@@ -155,104 +177,16 @@ module.exports = function(){
 		return false;
 	}
 
-     // if the user has not logged in, make them do so	
-     router.all('*', function (req, res, next) {
-          if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
-	            console.log("redirect");
-	            console.log(req.session.quiz_id);
-			  	console.log(req.session.quiz_name);
-			  	console.log(req.session.employee_id);
-               	res.redirect('/login')
-          }
-          else {
-               next();
-          }
-     });
 
+	function storeQuizResults(req, res, user_answers){
+		var context = {};
+		context.quiz_finished = true;
 
-    // handles the form input for employer logins
-	router.get('/', function(req,res){
-        var context = {};
 		var mysql = req.app.get('mysql');
 		var session = req.app.get('session');
-  		
-  		console.log(req.session.quiz_id);
-  		console.log(req.session.quiz_name);
-  		console.log(req.session.employee_id);
-
-        mysql.pool.query('SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id', [req.session.quiz_id],
-			function (error, results, fields) {
-			// log query results
-			console.log("Results\n", results);
-
-			if(error){
-				res.write(JSON.stringify(error));
-				res.end();
-			}
-
-			else {
-
-				var questions = [];
-				var answers_arr = [];
-				var answer_count = 0;
-				var question_count = 0;
-				var current_question_id = results[0].question_id;
-				var questMultCorrect = checkMultipleAnswers(results, current_question_id);
-
-				for (var i = 0; i < results.length; i++){
-					if (current_question_id != results[i].question_id){
-						var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
-						current_question_id = results[i].question_id;
-						questMultCorrect = checkMultipleAnswers(results, current_question_id);
-						answers_arr = [];
-						questions.push(question_answer_obj);
-					}
-
-					var temp_arr = [];
-					temp_arr.push(results[i].answer_text);
-					temp_arr.push(results[i].answer_id);
-					answers_arr.push(temp_arr);
-
-				}
-
-				var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
-				questions.push(question_answer_obj);
-
-				console.log("questions", questions);
-				context.questions = questions;
-				context.quiz_name = req.session.quiz_name;
-				context.timer = req.session.timer;
-
-				res.render('quiz', context);
-			    
-            }
-
-		});
-	});
-
-	// handles the form input for employee logins
-	router.post('/', function(req,res){
-        var context = {};
-		var mysql = req.app.get('mysql');
-		var session = req.app.get('session');
-  		
-  		console.log("body", req.body);
-  		const user_answers = Object.keys(req.body);
-  		console.log(user_answers);
-  		context.quiz_finished = true;
-
-		// If the user did not submit any answers
-		if (req.body.length === 0){
-			var emailString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " submitted a blank quiz </h1>";
-			sendEmail(emailString, 'dongbr@oregonstate.edu', req.session.employee_fname, req.session.employee_lname, req.session.quiz_name);
-
-			req.session.destroy();
-			res.render('login', context);
-		}
-
-  		var query = 'SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id WHERE answers.correct = 1';
-  		mysql.pool.query(query, [req.session.quiz_id],
-			function (error, results, fields) {
+		var query = 'SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id WHERE answers.correct = 1';
+		mysql.pool.query(query, [req.session.quiz_id],
+		function (error, results, fields) {
 			// log query results
 			console.log("Results\n", results);
 
@@ -315,7 +249,7 @@ module.exports = function(){
 				}
 
 
-				console.log("params", params);
+				// console.log("params", params);
 
 				mysql.pool.query(query, [params], function(error,results,fields){
 					if (error){
@@ -324,17 +258,174 @@ module.exports = function(){
 					}
 					else {
 
-						checkUserAnswers(req,res, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name);
+						checkUserAnswers(req, res, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name, req.session.quiz_id);
 						req.session.destroy();
-  						res.render('login', context);
+						res.render('login', context);
 					}
 				});
+		    }
+
+		});
+	}
+
+	function createQuiz(req, res, quiz_name, timer){
+	    var context = {};
+	    var mysql = req.app.get('mysql');
+		var session = req.app.get('session');
+
+	    mysql.pool.query('SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id', [req.session.quiz_id],
+	        function (error, results, fields) {
+	        // log query results
+	        console.log("Results\n", results);
+
+	        if(error){
+	            res.write(JSON.stringify(error));
+	            res.end();
+	        }
+
+	        else {
+
+	            var questions = [];
+	            var answers_arr = [];
+	            var answer_count = 0;
+	            var question_count = 0;
+	            var current_question_id = results[0].question_id;
+	            var questMultCorrect = checkMultipleAnswers(results, current_question_id);
+
+	            for (var i = 0; i < results.length; i++){
+	                if (current_question_id != results[i].question_id){
+	                    var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
+	                    current_question_id = results[i].question_id;
+	                    questMultCorrect = checkMultipleAnswers(results, current_question_id);
+	                    answers_arr = [];
+	                    questions.push(question_answer_obj);
+	                }
+
+	                var temp_arr = [];
+	                temp_arr.push(results[i].answer_text);
+	                temp_arr.push(results[i].answer_id);
+	                answers_arr.push(temp_arr);
+
+	            }
+
+	            var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
+	            questions.push(question_answer_obj);
+
+	            console.log("questions", questions);
+	            context.questions = questions;
+	            context.quiz_name = quiz_name;
+	            context.timer = timer;
+
+	            res.render('quiz', context);
+	            
+	        }
+
+	    });    
+	}
 
 
-			    
-            }
+     // if the user has not logged in, make them do so	
+     router.all('*', function (req, res, next) {
+          if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
+	            console.log("redirect");
+	            console.log(req.session.quiz_id);
+			  	console.log(req.session.quiz_name);
+			  	console.log(req.session.employee_id);
+               	res.redirect('/login')
+          }
+          else {
+               next();
+          }
+     });
 
-        });
+
+    // handles creating the quiz for the employee
+	router.get('/', function(req,res){
+        var context = {};
+		var mysql = req.app.get('mysql');
+		var session = req.app.get('session');
+  		
+  		console.log(req.session.quiz_id);
+  		console.log(req.session.quiz_name);
+  		console.log(req.session.employee_id);
+
+  		// check if the user has taken the quiz already
+  		mysql.pool.query('SELECT * FROM quiz_employee WHERE employee_id=? AND quiz_id=?', [req.session.employee_id, req.session.quiz_id],
+	        function (error, results, fields) {
+	        // log query results
+	        console.log("Results\n", results);
+
+	        if(error){
+	            res.write(JSON.stringify(error));
+	            res.end();
+	        }
+
+	        
+	        if (results.lenth === 0){
+	        	context.alreadyTaken = true;
+	        	req.session.destroy();
+	        	res.render('login',context);
+	        }
+
+	        else {
+
+	            createQuiz(req, res, req.session.quiz_name, req.session.timer);
+	            
+	        }
+
+	    });
+
+        
+	});
+
+	// handles the form input for employee quiz results
+	router.post('/', function(req,res){
+        var context = {};
+		var mysql = req.app.get('mysql');
+		var session = req.app.get('session');
+  		
+  		console.log("body", req.body);
+  		const user_answers = Object.keys(req.body);
+  		
+
+		// If the user did not submit any answers
+		if (req.body.length === 0){
+			var emailString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " submitted a blank quiz </h1>";
+			get_and_send_email(req, res, emailString, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name, req.session.quiz_id);
+			context.quiz_finished = true;
+
+			req.session.destroy();
+			res.render('login', context);
+		}
+
+  		else {
+
+  			// Log the user as having taken the quiz
+  			mysql.pool.query('INSERT INTO quiz_employee (quiz_id, employee_id, quiz_taken) VALUES (?,?,?)', [req.session.quiz_id, req.session.employee_id, '1'], function (error, results, fields) {
+		        // log query results
+		        console.log("Results\n", results);
+
+		        if(error){
+		            res.write(JSON.stringify(error));
+		            res.end();
+		        }
+
+		        // check if the user has taken the quiz already
+		        if (results.lenth === 0){
+		        	context.quiz_finished = true;
+		        	req.session.destroy;
+		        	res.render('login',context);
+		        }
+
+		        else {
+
+		           	storeQuizResults(req, res, user_answers);
+		            
+		        }
+
+	    	});
+  			
+  		}
 
 	});
 	
