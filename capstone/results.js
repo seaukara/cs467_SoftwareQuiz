@@ -88,7 +88,7 @@ module.exports = function(){
                 // console.log("tableData=", tableData);
                 // console.log("pieData=", pieData);
                 // console.log("data=", pieData[results[0].question_id]);
-                mysql.pool.query('SELECT quiz.*, ROUND(SUM(score.corrected_score)/COUNT(score.question_id)*100, 2) as score FROM `quiz` JOIN (SELECT scores.quiz_id, answers.question_id, SUM(correct) as num_correct_answers, 1/ SUM(correct) as answer_value, scores.correct_count, scores.attempt_count, scores.correct_count/scores.attempt_count as score, (scores.correct_count/scores.attempt_count)*(1/ SUM(correct)) as corrected_score FROM `answers` JOIN (SELECT results.quiz_id, question_id, SUM(IF(selected_question_id=correct_question_id, 1, 0)) as correct_count, COUNT(result_id) as attempt_count FROM `results` JOIN `quiz` ON quiz.quiz_id=results.quiz_id GROUP BY question_id) scores ON scores.question_id=answers.question_id GROUP BY question_id) score ON score.quiz_id=quiz.quiz_id WHERE quiz.quiz_id=?',[req.query.quiz_id],
+                mysql.pool.query('SELECT quiz.*, score FROM `quiz` LEFT JOIN ( SELECT results.quiz_id, ROUND(SUM(correct)/COUNT(correct)*100, 2) as score from `results` LEFT JOIN `answers` ON results.selected_question_id=answers.answer_id group by quiz_id) quiz_totals ON quiz_totals.quiz_id = quiz.quiz_id where quiz.quiz_id=?',[req.query.quiz_id],
                     function (error, quizzes) {
                         // log query results
                         // console.log("quizzes List Results\n", quizzes);
