@@ -2,7 +2,7 @@
 
 
 
-<h1> Welcome {{full_name}}</h1>
+<h4> Welcome, {{full_name}}</h4>
 
 <div class="row">
     <div class="col-lg-12">
@@ -22,11 +22,11 @@
                 <table class="table bootstrap-datatable countries">
                     <thead>
                     <tr>
-                        <th >Employee Name</th>
-                        <th >Email</th>
+                        <th style="width:15%">Employee Name</th>
+                        <th style="width:19%">Email</th>
                         <th style="width:10%">Results</th>
-                        <th style="width:35%">Performance</th>
-                        <th style="width:10%">Delete</th>
+                        <th style="width:33%">Performance</th>
+                        <th style="width:10%; text-align: center">Delete</th>
                     </tr>
                     </thead>
                 <tbody>
@@ -45,14 +45,14 @@
                         </td>
                         <td>
                             <div class="progress thin">
-                                <div class="progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
+                                <div id="prog1_{{employee_id}}" class="progress-bar-danger" role="progressbar" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{percent}}%">
                                 </div>
-                                <div class="progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
-                                </div>
+{{!--                                <div  id="prog2_{{employee_id}}" class="progress-bar-warning" role="progressbar" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100" style="width: 27%">--}}
+{{!--                                </div>--}}
                             </div>
                             <span class="sr-only">73%</span>
                         </td>
-                        <td>
+                        <td style="text-align: center">
                             <button type="button" class="btn" style='background: transparent;' data-toggle="modal" data-target="#employeeModal{{employee_id}}"}><img src="static/img/delete.png" style="height:18px; "></button>
                             </a>
                             <div class="container">
@@ -137,10 +137,11 @@
 
                         <td>
                             <div class="progress thin">
-                                <div class="progress-bar-danger" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100" style="width: 73%">
+
+                                <div id="prog2_{{quiz_id}}" class="progress-bar-danger" role="progressbar" aria-valuenow="{{score}}" aria-valuemin="0" aria-valuemax="100" style="width: {{score}}%">
                                 </div>
-                                <div class="progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">
-                                </div>
+{{!--                                <div class="progress-bar-warning" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100" style="width: 27%">--}}
+{{!--                                </div>--}}
                             </div>
                             <span class="sr-only">73%</span>
                         </td>

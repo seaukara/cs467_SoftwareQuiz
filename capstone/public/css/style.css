@@ -1041,9 +1041,10 @@ ul.sidebar-menu li.active a i {
 
     display: inline-block;
 
-    margin-top: 60px;
+    /*margin-top: 60px;*/
 
-    padding: 15px;
+    /*padding-top: 15px;*/
+    /*padding-bottom: 15px;*/
 
     width: 100%;
 
@@ -2045,7 +2046,9 @@ div[data-role="editor-toolbar"] {
   background-color : #e65097;
 
 }
-
+.card {
+    box-shadow: 0 0 0 0 rgba(90, 113, 208, 0.11), 0 4px 16px 0 rgba(167, 175, 183, 0.33);
+}
 .teal-bg {
 
   color : #fff;
@@ -2217,7 +2220,17 @@ div[data-role="editor-toolbar"] {
 
 
 }
-
+.sticky {
+    font-size: 14px;
+    /*padding: 2rem 0;*/
+    /*float:left;*/
+    /*margin-bottom: 2rem;*/
+}
+.sticky-content {
+    font-size: 14px;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
 .panel .panel-heading .panel-actions {
 
   float: right;
@@ -3843,7 +3856,7 @@ div[data-role="editor-toolbar"] {
 
 .personal-task tbody tr td{
 
-    padding: 11px 15px;
+    padding: 2px 10px 2px 5px;
 
     border-color: #eeeff1;
 
@@ -3869,9 +3882,10 @@ div[data-role="editor-toolbar"] {
 
 .personal-task.table-hover > tbody > tr:hover > td,
 
+
 .table-hover > tbody > tr:hover > th {
 
-    background-color: #f7f8fc;
+    /*background-color: #f7f8fc;*/
 
 }
 
@@ -3879,7 +3893,7 @@ div[data-role="editor-toolbar"] {
 
 .personal-task.table-hover > tbody > tr:hover > td i{
 
-    color: #688a7e;
+    /*color: #688a7e;*/
 
 }
 
@@ -4067,7 +4081,7 @@ div[data-role="editor-toolbar"] {
 
    display: inline-block;
 
-   padding: 30px 0;
+   /*padding: 30px 0;*/
 
 }
 
@@ -5789,7 +5803,7 @@ ul.ft-link li a i {
 
 .table-inbox .icon_star_alt:hover, .starred{
 
-    color: #FCB322;
+    /*color: #FCB322;*/
 
 }
 
@@ -10019,7 +10033,7 @@ span.customSelect.changed {
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
 .progress-bar-danger {
-    background-color: #ff2d55;
+    background-color: #4cd964;
 }
 .progress-striped .progress-bar-danger {
     background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));

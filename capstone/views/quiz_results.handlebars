@@ -1,1 +1,598 @@
-<div>Test Results Quiz id: {{quiz_id}}</div>
+{{!--<script>--}}
+<script src="/static/charts/Chart.js"></script>
+<style>.table-hover tbody tr:hover {
+    background-color: white;
+    }</style>
+
+{{!--<link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>--}}
+{{!--<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'></script>--}}
+{{!--<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>--}}
+{{!--<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>--}}
+{{!--<script src="Chart.js"></script>--}}
+<script>
+    // var Chart = require('chart.js');
+
+    $(document).ready(function() {
+        document.getElementsByClassName("wrapper")['style'] = "background-color:blue";
+
+
+        let decodedJson = decodeURIComponent("{{{copy3}}}");
+        let jsonObj = JSON.parse(decodedJson);
+        let qid = 1;
+        Object.keys(jsonObj).forEach(
+            function(key) {
+                jsonObj[key].qid = qid;
+                qid++;
+            }
+        )
+
+        let ctx = $("#chart-line");
+        console.log("first = ","{{score}}");
+        window.myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ["Incorrect", "Correct"],
+                datasets: [{
+                    data: [100-parseInt("{{score}}"), (parseInt("{{score}}"))],
+                    backgroundColor: ["#744444", "#749785", "#a8bcf1", "#2f3249"]
+
+                }]
+            },
+            options: {
+
+                title: {
+                    display:true,
+                    fontColor: "black",
+                    fontSize: 14,
+                    text: ""
+                },
+                // responsive: true,
+                legend: {
+                    display:true,
+                    position: 'left',
+                    align: 'center',
+                    labels: {
+                        fontColor: "black",
+                        boxWidth: 20,
+                        padding: 20
+                    }
+                }
+
+
+
+            }
+        });
+
+
+        var ctx_total = $("#chart-pie");
+        {{!--console.log("first = ","{{first}}");--}}
+        window.totalPie = new Chart(ctx_total, {
+            type: 'pie',
+            data: {
+                labels: ["Incorrect", "Correct"],
+                datasets: [{
+                    data: [100-parseInt("{{score}}"), (parseInt("{{score}}"))],
+                    backgroundColor: ["#744444", "#749785", "#a8bcf1", "#2f3249"]
+                }]
+            },
+            options: {
+                // responsive: true,
+                legend: {
+                    display:true,
+                    position: 'left',
+                    align: 'center',
+                    labels: {
+                        fontColor: "black",
+                        boxWidth: 20,
+                        padding: 20
+                    }
+                }
+
+
+
+            }
+        });
+        let colors = ["#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260'];
+        let color_count = 0;
+        let bar = $("#chart-bar");
+        let input = [];
+        for (let i = 0; i < Object.keys(jsonObj).length; i++) {
+            // console.log(jsonObj[Object.keys(jsonObj)[i]]);
+            let answers = jsonObj[Object.keys(jsonObj)[i]]['answers'];
+            // console.log("q ", p);
+            // console.log(answers);
+            let q_count = 0;
+            //
+            for (let p = 0; p < Object.keys(answers).length; p++) {
+                if (input[p]) {
+                    console.log('j')
+                } else {
+                    input.push({
+                        data: [],
+                        label: "",
+                        borderColor: colors[color_count],
+                        fill: true,
+                        backgroundColor: colors[color_count]
+                    });
+                    color_count++;
+                }
+            }
+        }
+        // for (let i = 0; i < Object.keys(jsonObj).length; i++) {
+            // }
+            // console.log(input);
+            //
+
+        for (let p = 0; p <input.length; p++) {
+            input[p].label = "Answer ".concat(p+1);
+
+            // console.log(answers);
+            for (let i = 0; i < Object.keys(jsonObj).length; i++) {
+
+                let answers = jsonObj[Object.keys(jsonObj)[i]]['answers'];
+                if (answers[Object.keys(answers)[p]]) {
+                    input[p].data.push(answers[Object.keys(answers)[p]].count)
+
+                } else {
+                    // console.log("none")
+                    input[p].data.push(null);
+
+                }
+            }
+        }
+        // for (let n=0; n < input.length; n++) {
+        //     input[n].forEach(function(item) {
+        //         if (item == null) {
+        //             input[n].pop(item);
+        //         }
+        //     })
+        // }
+            //
+            //     // if (input[p]) {
+            //     input[p].data.push(answers[Object.keys(answers)[p]].count)
+            //         input[p].label = "Answer ".concat(p+1);
+            //     // } else {
+            //     //
+            //     //     input[p].data = [answers[Object.keys(answers)[p]].count]
+            //     //     input[p].label = "Answer ".concat(p+1);
+            //     // }
+            //
+            // }
+        // }
+
+        console.log("input = ", input);
+        let labelsQ = [];
+        Object.keys(jsonObj).forEach(function(key) {
+
+            labelsQ.push("Question ".concat(jsonObj[key].qid));
+        });
+        window.myBarChart = new Chart(bar, {
+            type: 'bar',
+            data: {
+                labels:labelsQ,
+                datasets: input
+            },
+            options: {
+                title: {
+                    display: true,
+                    // text: 'World population per region (in millions)'
+                },
+                maintainAspectRatio: false,
+                onClick: graphClickEvent,
+                tooltips: {enabled: false},
+                hover: {mode: null},
+                // responsive: true,
+                legend: {
+                    // display:true,
+                    position: 'right',
+                    align: 'center',
+                    labels: {
+                        fontColor: "black",
+                        boxWidth: 20,
+                        padding: 20
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        id: 'y-axis-0',
+                        gridLines: {
+                            display: true,
+                            lineWidth: 1,
+                            color: "rgba(0,0,0,0.30)"
+                        },
+                        ticks: {
+                            beginAtZero:true,
+
+
+                        },
+
+
+                        afterBuildTicks: function(chart) {
+
+                        }
+                    }],
+
+                    xAxes: [{
+                        id: 'x-axis-0',
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+
+    });
+    function getInfo(div, data, question) {
+        let co = 1;
+        for (let t = 0; t < document.getElementsByClassName("question_rows").length; t++) {
+            document.getElementById("r_".concat(co)).style['backgroundColor']= "white";
+            console.log("ROW=", document.getElementById("r_".concat(co)))
+            co++;
+        }
+        console.log("score = ", data);
+        let score = data;
+        let chart = window.myPieChart;
+        // console.log(window.myPieChart.config.data);
+        let slices = [100-data, data];
+        chart.data.datasets.forEach((dataset) => {
+            console.log("dataset.data =", dataset.data);
+            dataset.data = [];
+        });
+
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data = [100-data, data];
+
+            console.log("dataset.data 2 =", dataset.data)
+        });
+        // chart.data.datasets.push(100-data);
+
+        // console.log(window.myPieChart.config.data);
+        chart.options.title.text = question;
+        chart.update();
+        document.getElementById("question_pie").hidden = false;
+        document.getElementById("question_pie1").hidden = false;
+        document.getElementById("question_pie2").hidden = false;
+        // document.getElementById("qcorrect").hidden = false;
+        document.getElementById("qcorrect-per1").hidden = false;
+
+        document.getElementById("qcorrect-per1").innerText = score;
+        document.getElementById("qcorrect-per1").innerText=document.getElementById("qcorrect-per1").innerText.concat("%")
+        document.getElementById("qcorrect-per2").hidden = false;
+
+        document.getElementById("qcorrect-per2").innerText = 100-score;
+        document.getElementById("qcorrect-per2").innerText=document.getElementById("qcorrect-per2").innerText.concat("%")
+
+
+    }
+    function graphClickEvent(event, array){
+        let col = ["#749785", "#425179", "#a8bcf1", "#009acc", '#364d4e', '#59e21e', '#ACF8E2'];
+        let colClear = ["#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260'];
+        var decodedJson = decodeURIComponent("{{{copy3}}}");
+        var jsonObj = JSON.parse(decodedJson);
+        var activeElement = window.myBarChart.getElementAtEvent(event)[0];
+        //
+        // console.log(activeElement);
+        // var test = window.myBarChart.getElementById()[0];
+        // test.custom = {};
+        // console.log("event", event);
+        // window.myBarChart.getElementAtEvent(event)[0]._chart.config.data.datasets[0].backgroundColor="#000"
+        if (document.getElementById("memory")) {
+            if (document.getElementById("memory").name) {
+                console.log(document.getElementById("memory").name);
+                // let c = col[document.getElementById("memory").name[1]]
+                // let c = window.myBarChart.getDatasetMeta(document.getElementById("memory").name[0]).data[document.getElementById("memory").name[1]].custom.backgroundColor;
+                // c = c.substring(0, c.length -2);
+                console.log(window.myBarChart.getDatasetMeta(document.getElementById("memory").name[0]).data[document.getElementById("memory").name[1]].custom.backgroundColor);
+                window.myBarChart.getDatasetMeta(document.getElementById("memory").name[0]).data[document.getElementById("memory").name[1]].custom.backgroundColor = colClear[document.getElementById("memory").name[0]];
+
+            }
+
+            // window.myBarChart.getDatasetMeta(document.getElementById("memory").value).custom.backgroundColor = c;
+
+
+        }
+        //     let oldElement = window.myBarChart.getDatasetMeta(document.getElementById("memory").value);
+        //     oldElement.data[0].remove('custom');
+        // }
+
+        activeElement.custom = activeElement.custom || {};
+        console.log([activeElement._datasetIndex, activeElement._index]);
+        activeElement.custom.backgroundColor = col[activeElement._datasetIndex];
+
+        console.log(activeElement);
+        // document.getElementById("memory").background = [activeElement._datasetIndex, activeElement._index];
+        let question_id = Object.keys(jsonObj)[parseInt(activeElement._model.label.split("Question ")[1])-1];
+        let answer_id = parseInt(activeElement._datasetIndex);
+        // console.log(answer_id);
+        console.log(question_id);
+
+        // console.log(jsonObj[question_id]['answers'])
+        // console.log([Object.keys(jsonObj[question_id]['answers'])[answer_id]])
+        let info = jsonObj[question_id]['answers'][Object.keys(jsonObj[question_id]['answers'])[answer_id]];
+        // console.log(info);
+        console.log("activeElement = ", activeElement);
+
+        // console.log(activeElement);
+        // console.log(event);
+        // if(array[0]){
+        //     console.log(array[0]);
+        //
+        // }
+        document.getElementById("bar-details").hidden=false;
+        // document.getElementById("shut").hidden = false;
+        document.getElementById("bar-details-answer").innerText=info.answer;
+        document.getElementById("bar-details-question").innerText=jsonObj[question_id].question;
+        document.getElementById("bar-details-count").innerText=info.count;
+        document.getElementById("memory").name = [activeElement._datasetIndex, activeElement._index];
+        window.myBarChart.update();
+        document.getElementById("bar_cards").hidden=false;
+        console.log("r_".concat(activeElement._model.label.split("Question ")[1]));
+        let co = 1;
+        for (let t = 0; t < document.getElementsByClassName("question_rows").length; t++) {
+            document.getElementById("r_".concat(co)).style['backgroundColor']= "white";
+            console.log("ROW=", document.getElementById("r_".concat(co)))
+            co++;
+        }
+        document.getElementById("r_".concat(activeElement._model.label.split("Question ")[1])).style["backgroundColor"]="#fed189";
+        // document.getElementById("memory").background = [activeElement._datasetIndex, activeElement._index];
+    }
+    function closeInfo() {
+        console.log("HELLO");
+        document.getElementById("bar-details").hidden = true;
+        document.getElementById("shut").hidden = true;
+    }
+</script>
+
+<div id="memory" hidden></div>
+{{!--<div class="row">--}}
+<section id="container" style="height:100%">
+{{!--    <div class="col-lg-12" style="position:fixed; padding-top:80px">--}}
+{{!--    <div class="row" style="min-height:80px"></div>--}}
+    <div class="row" style="height:10%"><h4>Results for {{quiz_name}}</h4></div>
+        <div class="row" style="height:30%">
+{{!--            <div class="col-lg-12" >--}}
+                <div class="row" style="width:100%; margin-left:0px;margin-right:0px;">
+                    <div class="col-lg-9" style="padding:15px;">
+{{!--                        <div class="tooltip">--}}
+
+
+                        <section class="card" >
+{{!--                                    <div class="row" >--}}
+                            <div class="card-header"><p id="bar-details-text" class="mb-0 font-weight-bold">Results by Answer Response</p></div>
+                            <div class="card-body" style="padding:60px;" >
+
+                                <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"></div>
+                                <canvas id="chart-bar" height=299 class="chartjs-render-monitor" style="top: -10px;right:-10px;display: block; " onloadstart="updateBar()"></canvas>
+                            </div>
+
+{{!--                                        <div class="card-body" style="margin-top:10px">--}}
+{{!--                                        <div class="card-header"><button id="shut" onclick="closeInfo()" style="float:right;border:none;margin:0px;padding:0px;background-color: #00000000" hidden><strong>x</strong></button></div>--}}
+                        </section>
+{{!--                            <span class="tooltiptext">Tooltip text</span>--}}
+{{!--                        </div>--}}
+{{!--                    </div>--}}
+                        <div id="bar_cards" class="row" style="width:100%; margin-left:0px;margin-right:0px;padding-top:10px" hidden>
+
+                            <section class="card" style="width:40%">
+                                <div id="bar-details" class="card-body" style="border:none; padding:20px" >
+
+                                    <p id="bar-details-text" class="mb-0 font-weight-bold">Question</p>
+
+                                    <p id="bar-details-question" class="mb-0 font-weight-semibold"></p><br>
+                                </div>
+                            </section>
+
+                            <section class="card" style="width:40%">
+                                <div id="bar-details" class="card-body" style="border:none; padding:20px" >
+                                        <p id="bar-details-text" class="mb-0 font-weight-bold">Answer</p>
+                                        <p id="bar-details-answer" class="mb-0 font-weight-semibold"></p>
+    {{!--                                            </div>--}}
+                                    </div>
+                            </section>
+                            <section class="card" style="width:20%">
+                                <div id="bar-details" class="card-body" style="border:none; padding:20px" >
+                                    <p id="bar-details-count_text" class="mb-0 font-weight-bold">Count</p>
+                                    <p id="bar-details-count" class="mb-0 font-weight-semibold"></p>
+                                    {{!--                                            </div>--}}
+                                </div>
+                            </section>
+                        </div>
+{{!--                                    </div>--}}
+
+                    </div>
+                    <br>
+                    <div class="col-lg-3" style="padding:15px; ">
+                        <section class="card">
+    {{!--                            <div class="card-body" >--}}
+
+    {{!--                            </div>--}}
+                            <div class="card-header"><p id="pieHeader" class="mb-0 font-weight-bold">Total Results</p></div>
+    {{!--                            <div class="card-body"></div>--}}
+
+                            <div class="card-body" style="padding:30px">
+                                <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"></div>
+                                <canvas id="chart-pie" height=100px class="chartjs-render-monitor" style="display: block; "></canvas>
+                            </div>
+                        </section>
+{{!--                                <div class="card-header"></div>--}}
+                                {{!--                            <div class="card-body"></div>--}}
+
+                        <section id="question_pie" class="card" style="margin-top:5px;"  hidden>
+                            <div class="card-header"><p id="pieHeader" class="mb-0 font-weight-bold">Results by Question</p></div>
+                            <div  class="card-body" style="padding:30px;padding-top:10px;padding-bottom:10px">
+                                <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"></div>
+                                <canvas id="chart-line" height=100px class="chartjs-render-monitor" style="display: block;"></canvas>
+                            </div>
+                            <div class="row">
+                            <section id="question_pie1" class="card" style="margin:1%;width:48%;z-index:1;float:left" hidden>
+                                <div  class="card-body" style="padding:0px">
+                                    <div id="bar-details" style="border:none; padding:10px" >
+{{!--                                        <p id="qcorrect" class="mb-0 font-weight-bold">Score</p>--}}
+                                        <p id="qcorrect-per1" class="mb-0 font-weight-bold"style="color:#749785;font-size: x-large;margin:0px;text-align: center"></p>
+
+                                    </div>
+                                </div>
+                            </section>
+                            <section id="question_pie2" class="card" style="margin:1%;width:48%;z-index:1;float:right" hidden>
+                                <div  class="card-body" style="padding:0px">
+                                    <div id="bar-details"  style="border:none; padding:10px" >
+{{!--                                        <p id="qcorrect" class="mb-0 font-weight-bold"></p>--}}
+                                        <p id="qcorrect-per2" class="font-weight-bold" style="color:#744444;font-size: x-large;margin:0px;text-align: center"></p>
+                                    </div>
+                                </div>
+                            </section>
+                            </div>
+                        </section>
+
+
+{{!--                            </div>--}}
+                    </div>
+{{!--                            <div class="card-body" style="width:50%">--}}
+{{!--                                <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"></div>--}}
+{{!--                                <canvas id="chart-line" width="299" height="200" class="chartjs-render-monitor" style="display: block; width: 299px; height: 200px;"></canvas>--}}
+{{!--                            </div>--}}
+{{!--                        </div>--}}
+{{!--                        <div class="card-header"></div>--}}
+
+
+                    <br>
+{{!--            </div>--}}
+        </div>
+        </div>
+        <div class="row" style="margin-top:10px;bottom:10px">
+            <div class="col-lg-12" >
+                    <section class="card">
+                        <div class="card-body" >
+                            <table class="table table-hover personal-task">
+                                <tbody>
+                                <tr style="border-top: none">
+                                    <th style="border:none;">ID</th>
+                                    <th style="border:none;">Questions</th>
+                                    <th style="border:none;">Answer</th>
+                                    <th style="border:none; float: right;">Score</th>
+                                    <th style="border:none;">View</th>
+                                </tr>
+                                    {{#each tableData as |r|}}
+
+
+
+                                        <tr class="question_rows" id="r_{{r.id}}">
+                                            <td>{{r.id}}</td>
+                                        <td>{{r.[0].[0]}}</td>
+{{!--                                        <td>question</td>--}}
+                                        <td colspan="2">
+                                            <table style="width:100%">
+                                                <tbody>
+                                                {{#each r as |row|}}
+                                                <tr style="border:none">
+                                                    <td style="border:none">
+                                                        {{row.[1]}}
+                                                    </td>
+{{!--                                                </tr>--}}
+{{!--                                                {{/each}}--}}
+{{!--                                                </tbody>--}}
+{{!--                                            </table>--}}
+
+{{!--                                        </td>--}}
+{{!--                                        <td>--}}
+{{!--                                            <table>--}}
+{{!--                                                <tbody>--}}
+{{!--                                                {{#each r as |row|}}--}}
+{{!--                                                    <tr>--}}
+                                                        <td style="float: right; border:none">
+                                                            {{row.[2]}}
+                                                        </td>
+                                                    </tr>
+                                                {{/each}}
+                                                </tbody>
+                                            </table>
+
+                                        </td>
+{{!--                                        <td>button</td>--}}
+
+                                        <td><button class="badge bg-important" style="padding-bottom: 10px;font-weight:500;border:none" onclick="getInfo(this, {{r.[0].[3]}}, '{{{r.[0].[0]}}}')" >View</button></td>
+
+                                        </tr>
+
+
+                                    {{/each}}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+            </div>
+        </div>
+
+</section>
+
+{{!--                        <div class="card-header" style="width:50%"></div>--}}
+{{!--                        <div class="card-body" style="width:50%">--}}
+
+{{!--                            --}}{{!--                                <canvas id="pieChart" width="1176" height="588" class="chartjs-render-monitor" style="display: block; height: 294px; width: 588px;"></canvas>--}}
+{{!--                            --}}{{!--                                <canvas id="canvas"></canvas>--}}
+{{!--                            --}}{{!--                                <div id="piechart""></div>--}}
+{{!--                            <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">--}}
+{{!--                                --}}{{!--                                    <div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">--}}
+{{!--                                --}}{{!--                                        <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div>--}}
+{{!--                                --}}{{!--                                    </div>--}}
+{{!--                                --}}{{!--                                    <div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">--}}
+{{!--                                --}}{{!--                                        <div style="position:absolute;width:200%;height:200%;left:0; top:0"></div>--}}
+{{!--                                --}}{{!--                                    </div>--}}
+{{!--                            </div> <canvas id="chart-line" width="200" height="100" class="chartjs-render-monitor" style="display: block; width: 299px; height: 200px;"></canvas>--}}
+
+{{!--                        </div><div class="card-body" style="width:50%">--}}
+
+{{!--                    </div>--}}
+
+{{!--                    </section>--}}
+{{!--                </div>--}}
+{{!--                <div class="col-lg-3">--}}
+{{!--                    <section class="card">--}}
+{{!--                        <div class="card-header">--}}
+
+{{!--                            Total Quiz Results--}}
+{{!--                        </div>--}}
+{{!--                        <div class="card-body">--}}
+{{!--                            <canvas id="canvas" height="50" width="100"></canvas>--}}
+{{!--                        </div>--}}
+{{!--                    </section>--}}
+{{!--                </div>--}}
+{{!--            </div>--}}
+
+
+{{!--    </div>--}}
+{{!--</div>--}}
+
+
+{{!--<script>--}}
+
+
+{{!--    var pieData = [--}}
+{{!--        {--}}
+{{!--            value: 30,--}}
+{{!--            label:"hi",--}}
+{{!--            color:"#F38630"--}}
+{{!--        },--}}
+{{!--        {--}}
+{{!--            value : 50,--}}
+{{!--            color : "#E0E4CC"--}}
+{{!--        },--}}
+{{!--        {--}}
+{{!--            value : 100,--}}
+{{!--            color : "#69D2E7"--}}
+{{!--        }--}}
+
+{{!--    ];--}}
+
+{{!--    var myPie = new Chart(document.getElementById("canvas").getContext("2d")).Pie(pieData);--}}
+
+
+{{!--</script>--}}
+{{!--<script src="js/jquery-1.8.3.min.js"></script>--}}

@@ -5,6 +5,8 @@
     <meta name="author" content="Kara Manseau and Brian Dong">
     <title>Software Programming Quiz</title>
     <link rel="stylesheet" href="/static/css/style.css" type="text/css">
+    <script src="node_modules/chartjs/dist/Chart.js"></script>
+{{!--    <script src="/static/js/Chart.js"></script>--}}
     <!-- Bootstrap CSS -->
 {{!--    <link href="static/css/bootstrap.min.css" rel="stylesheet">--}}
     <!-- Bootstrap Theme -->
@@ -27,13 +29,16 @@
     {{/each}}
 </head>
 <body>
-<section id="container" class="">
+<section id="container" style="float:left">
+    <div class="sticky">
     <header class="header dark-bg">
         <a href="/" class="logo">Software <span class="lite">Quiz</span></a>
     </header>
+    </div>
 </section>
 <section id="main-content">
-    <section class="wrapper">
+    <section class="wrapper" style="padding:20px">
+        <div class="row" style="min-height:80px"></div>
         {{{body}}}
     </section>
 </section>
