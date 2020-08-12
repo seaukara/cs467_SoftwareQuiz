@@ -1,1 +1,57 @@
-<div>Test Results Employee id:{{employee_id}}</div>
+
+
+{{!--Employee table start--}}
+	{{#if display_quiz_table}}
+	<h4 align="center"> {{full_name}}'s Performance</h4>
+    <div class="panel panel-default">
+        <div class="panel-heading" style="padding:10px;">
+            <h2> <strong> Quizzes </strong> </h2>
+        </div>
+        <div class="panel-body">
+            <table class="table bootstrap-datatable countries">
+                <thead>
+                <tr>
+                    <th style="width:15%">Quiz Name</th>
+                    <th style="width:33%">Quiz Performance</th>
+                </tr>
+                </thead>
+            {{#if display_quiz_list}}
+            <tbody>
+                {{#each quiz}}
+                <tr >
+                     <td>
+                        <a href="/results/results_single_quiz?full_name={{../full_name}}&quiz_name={{quiz_name}}&employee_id={{employee_id}}&quiz_id={{quiz_id}}&max_correct={{max_correct}}&actual_correct={{actual_correct}}" style='background: transparent;'>
+                        <button class="btn btn-info btn-sm"> {{quiz_name}} </button> </td>
+                        </a>
+                    <td>
+                        <div class="progress thin">
+                            <div id="prog1_{{employee_id}}" class="progress-bar-danger" role="progressbar" aria-valuenow="{{percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{percent}}%">
+                            </div>
+                        </div>
+                        <span class="sr-only">73%</span>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+            {{else}}
+			{{/if}}
+            </table>
+        </div>
+    </div>
+{{!--Employee table end--}}
+    {{else}}
+	{{/if}}
+	
+	{{#if display_quiz}}
+		<h4 align="center"> Quiz: {{quiz_name}}</h4><br>
+		{{{quizHTML}}}
+
+		<br>
+		<br>
+		<div style="text-align: center;"> 
+	        <a href="/results/results_employee?employee_id={{employee_id}}" style='background: transparent;'>
+	        <button class="btn btn-info btn-sm"> Back </button> </td>
+	        </a>
+        </div>
+	{{else}}
+	{{/if}}
