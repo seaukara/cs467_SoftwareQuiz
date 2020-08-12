@@ -3,6 +3,137 @@ module.exports = function(){
     let express = require('express');
     let router = express.Router();
 
+    function createQuizForView(req,res, quiz_id, quiz_name, employee_name, employee_id, max_correct, actual_correct){
+        var mysql = req.app.get('mysql');
+        
+        // get employee's selected answers
+        var query = "SELECT question_id, selected_question_id from results where employee_id=? AND quiz_id=?";
+        var params = [employee_id, quiz_id];
+        mysql.pool.query(query, params, function(error, results, fields){
+
+            // log query results
+            console.log("User Results\n", results);
+            if(error){
+                res.write(JSON.stringify(error));
+                res.end();
+            }
+
+            else{
+                var user_selections = results;
+                getAnswersAndCompare(req, res, quiz_id, quiz_name, employee_name, employee_id, user_selections, max_correct, actual_correct);
+                
+            }
+
+        });
+    }       
+
+
+
+
+
+
+    function getAnswersAndCompare(req, res, quiz_id, quiz_name, employee_name, employee_id, user_selections, max_correct, actual_correct){
+        var mysql = req.app.get('mysql');
+        var query = 'SELECT t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id'
+        var params = [quiz_id];
+        mysql.pool.query( query, params, function(error, results, fields) {
+        
+            // log query results
+            console.log("User Results\n", results);
+            if(error){
+                res.write(JSON.stringify(error));
+                res.end();
+            }
+
+            else {
+
+                var curr_id = results[0].question_id;
+                var quizStringObj = {};
+                var answerStringObj = {};
+                quizStringObj[curr_id] = "<br><h6>" + results[0].question + "</h6>";
+
+                for (var i = 1; i < results.length; i++){
+                    if (results[i].question_id != curr_id){
+                        curr_id = results[i].question_id;
+                        quizStringObj[curr_id] = "<br><h6>" + results[i].question + "</h6>";
+                    }
+                }
+
+                for (var i = 0; i < results.length; i++){
+                    var userSelectedQuest = false;
+                    var curr_id = results[i].question_id;
+                    for (var j = 0; j < user_selections.length; j++){
+                    
+                        if (results[i].question_id === user_selections[j].question_id && results[i].answer_id === user_selections[j].selected_question_id){
+                            
+                            if (results[i].correct === 1){
+                                var answerString = "<p>" + results[i].answer_text + "<span style='color:MediumSeaGreen;'> &#9745; </span></p>";
+                                quizStringObj[curr_id] += answerString;
+                            }
+
+                            else {
+                                var answerString = "<p>" + results[i].answer_text + "<span style='color:Tomato;'> &#9746; </span></p>";
+                                quizStringObj[curr_id] += answerString;
+                            }
+                            
+                                answerStringObj[results[i].answer_id] = true;
+                        }
+
+                    }
+        
+
+                    if (answerStringObj[results[i].answer_id] === undefined){ 
+                        var answerString = "<p>" + results[i].answer_text + "</p>";
+                        quizStringObj[curr_id] += answerString;
+                      
+                    }
+                }
+            
+                
+                var quizHTML = "<div style='text-align: center;'><div style='display: inline-block; text-align: left;'>" + "<h5>" + employee_name + " got " + actual_correct 
+                                    + " out of " + max_correct + " correct. Below are the results!</h5><span style='color:MediumSeaGreen;'> &#9745; = Correct Selection</span><br><span style='color:Tomato;'> &#9746; = Incorrect Selection</span><br><span> Blank = No Selection</span><br><br>";
+                /* Object.entries unsupported on node version 6
+                for (const [key, value] of Object.entries(quizStringObj)){
+                    quizHTML += `${value}`;
+                }
+                */
+                for (const property in quizStringObj){
+                    quizHTML += `${quizStringObj[property]}`;
+                }
+
+                quizHTML += "</div></div>";
+
+                var context = {};
+
+                console.log(quizHTML);
+                context.quizHTML = quizHTML;
+                context.display_quiz_table = false;
+                context.display_quiz = true;
+                context.full_name = employee_name;
+                context.quiz_name = quiz_name;
+                context.employee_id = employee_id;
+                console.log ('quiz', quizHTML);
+                res.render('employee_results', context);
+            }
+        });
+    }
+
+
+
+    // if the user has not logged in, make them do so  
+     router.all('*', function (req, res, next) {
+          if (!req.session.employer_id == null || req.session.employer_id == null) {
+                console.log("redirect");
+                console.log(req.session.quiz_id);
+                console.log(req.session.quiz_name);
+                console.log(req.session.employee_id);
+                res.redirect('/login')
+          }
+          else {
+               next();
+          }
+     });
+
     router.get('/results_quiz', function(req,res){
         if (!req.session.employer_id || req.session.employer_id == null) {
             res.redirect('/');
@@ -124,9 +255,128 @@ module.exports = function(){
         if (!req.session.employer_id || req.session.employer_id == null) {
             res.redirect('');
         }
-        res.render('employee_results', {
-            employee_id: req.query.employee_id
+
+        var context = {};
+        var mysql = req.app.get('mysql');
+        var session = req.app.get('session');
+
+        // get employee & quiz info
+        var query = 'SELECT quiz_name, quiz_id, t1.employee_id, fname, lname FROM (SELECT quiz_name, quiz.quiz_id, employee_id from quiz_employee INNER JOIN quiz ON quiz.quiz_id = quiz_employee.quiz_id WHERE employee_id=?) as t1 INNER JOIN employee ON employee.employee_id = t1.employee_id';
+        var params = [req.query.employee_id];
+        mysql.pool.query(query,params, function (error, results, fields) {
+            // log query results
+            console.log("Get Employee & Quiz Info Result\n", results);
+            if(error){
+                res.write(JSON.stringify(error));
+                res.end();
+            } 
+
+            if (results.length === 0){
+                context.display_quiz_list = false;
+                context.display_quiz_table = true;
+                res.render('employee_results', context);
+            }
+            else {
+                var quiz = [];
+                params = [];
+                for (var i = 0; i < results.length; i++){
+                    quiz.push({quiz_name: results[i].quiz_name, quiz_id: results[i].quiz_id, employee_id: results[i].employee_id, max_correct: 0, actual_correct: 0, percent: 0});
+                    params.push(String(results[i].quiz_id));
+                }
+
+                var full_name = results[0].fname + " " + results[0].lname;
+                context.full_name = full_name;
+
+
+                query = "SELECT quiz_id, COUNT(correct) as max_correct FROM (SELECT t1.quiz_id, t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT quiz_id, question_id, question FROM questions WHERE quiz_id IN (?)) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id) as t2 WHERE correct='1' GROUP BY quiz_id";
+                
+                mysql.pool.query(query, [params], function(error,results,fields){
+                    
+                    if(error){
+                        res.write(JSON.stringify(error));
+                        res.end();
+                    } 
+
+                    else {
+
+                        console.log("Count Max Correct for each quiz", results);
+                        for (var i = 0; i < results.length; i++){
+                            for (var j = 0; j < quiz.length; j++) {
+                                if (quiz[j].quiz_id === results[i].quiz_id){
+                                    quiz[j].max_correct = results[i].max_correct;
+                                }
+                            }
+
+                        }
+
+                        // Count user score
+                        query = "SELECT * FROM results INNER JOIN answers ON answers.answer_id=results.selected_question_id where employee_id=?"
+                        params = [req.query.employee_id];
+                        mysql.pool.query(query, params, function(error,results,fields){
+                            if(error){
+                                res.write(JSON.stringify(error));
+                                res.end();
+                            } 
+
+                            console.log("Count user score", results);
+                            for (var i = 0; i < results.length; i++){
+                                for (var j = 0; j < quiz.length; j++){
+                                    if (quiz[j].quiz_id === results[i].quiz_id) {
+                                        if (results[i].correct === 1){
+                                            quiz[j].actual_correct++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (var i = 0; i < quiz.length; i++){
+                                if (quiz[i].max_correct === 0)
+                                    quiz[i].percent = 0;
+                                
+                                else 
+                                    quiz[i].percent = ((quiz[i].actual_correct/quiz[i].max_correct) * 100).toFixed(0);
+                            }
+
+                            context.quiz = quiz;
+                            context.display_quiz_list = true;
+                            context.display_quiz_table = true;
+                            console.log("final", quiz);
+
+                            // console.log("context", context);
+                            res.render('employee_results', context);
+                        });
+                    }
+                });
+
+
+
+            }
         });
+
+    });
+
+    router.get('/results_single_quiz', function(req,res) {
+        if (!req.session.employer_id || req.session.employer_id == null) {
+            res.redirect('');
+        }
+
+        var employee_id = req.query.employee_id;
+        var quiz_id = req.query.quiz_id;
+        var max_correct = req.query.max_correct;
+        var actual_correct = req.query.actual_correct;
+        var full_name = req.query.full_name;
+        var quiz_name = req.query.quiz_name;
+
+        console.log(employee_id);
+        console.log(quiz_id);
+        console.log(max_correct);
+        console.log(actual_correct);
+        console.log(full_name);
+        console.log(quiz_name);
+
+
+        createQuizForView(req,res, quiz_id, quiz_name, full_name, employee_id, max_correct, actual_correct);
+
     });
 
     return router;
