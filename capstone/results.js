@@ -272,6 +272,9 @@ module.exports = function(){
                 res.write(JSON.stringify(error));
                 res.end();
             } 
+            
+            var full_name = results[0].fname + " " + results[0].lname;
+            context.full_name = full_name;
 
             if (results.length === 0){
                 context.display_quiz_list = false;
@@ -286,10 +289,6 @@ module.exports = function(){
                     quiz.push({quiz_name: results[i].quiz_name, quiz_id: results[i].quiz_id, employee_id: results[i].employee_id, max_correct: 0, actual_correct: 0, percent: 0});
                     params.push(String(results[i].quiz_id));
                 }
-
-                var full_name = results[0].fname + " " + results[0].lname;
-                context.full_name = full_name;
-
 
                 query = "SELECT quiz_id, COUNT(correct) as max_correct FROM (SELECT t1.quiz_id, t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT quiz_id, question_id, question FROM questions WHERE quiz_id IN (?)) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id) as t2 WHERE correct='1' GROUP BY quiz_id";
                 
