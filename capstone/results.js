@@ -11,8 +11,9 @@ module.exports = function(){
         let tableData = {};
         let pieData = {};
         let mysql = req.app.get('mysql');
-
-        let responseCounts = "SELECT quiz.quiz_name, questions.question_id, questions.question, answers.answer_id, answers.answer_text, answers.correct, IFNULL(r.answer_count, 0) as answer_count, question_count, ROUND(answer_count/question_count, 2)*100 as score FROM `quiz` LEFT JOIN `questions` ON `questions`.quiz_id = `quiz`.quiz_id LEFT JOIN `answers` on `questions`.question_id = `answers`.`question_id` LEFT JOIN ( SELECT selected_question_id, count(result_id) as answer_count FROM `results` GROUP BY selected_question_id ) r ON r.selected_question_id = answers.answer_id LEFT JOIN (SELECT question_id, count(question_id) as question_count FROM `results` GROUP BY question_id ) q ON q.question_id = `questions`.`question_id` WHERE `quiz`.quiz_id =?";
+        let responseCounts="SELECT quiz.quiz_name, questions.question_id, questions.question, answers.answer_id, answers.answer_text, answers.correct, IFNULL(selection_counts.answer_count, 0) AS answer_count, IFNULL(question_counts.question_count, 0) AS question_count, ROUND((IFNULL(selection_counts.answer_count, 0)/IFNULL(question_counts.question_count, 0))*100, 2) as score FROM `quiz` LEFT JOIN `questions` ON questions.quiz_id = quiz.quiz_id LEFT JOIN `answers` ON questions.question_id = answers.question_id LEFT JOIN ( SELECT answers.answer_id, IFNULL(COUNT(answer_count), 0) as answer_count FROM `answers` LEFT JOIN ( SELECT selected_question_id, employee_id as answer_count FROM `results` GROUP BY employee_id, selected_question_id ) AS counts ON counts.selected_question_id=answers.answer_id GROUP BY selected_question_id ) AS selection_counts ON selection_counts.answer_id = answers.answer_id LEFT JOIN ( SELECT questions.question_id, IFNULL(COUNT(question_count), 0) as question_count FROM `questions` LEFT JOIN ( SELECT question_id, employee_id as question_count FROM `results` GROUP BY employee_id, question_id ) AS counts ON counts.question_id=questions.question_id GROUP BY question_id, quiz_id) AS question_counts ON question_counts.question_id=questions.question_id WHERE quiz.quiz_id =?";
+        // let responseCounts = "SELECT quiz.quiz_name, questions.question_id, questions.question, answers.answer_id, answers.answer_text, answers.correct, IFNULL(r.answer_count, 0) as answer_count, question_count, ROUND(answer_count/question_count, 2)*100 as score FROM `quiz` LEFT JOIN `questions` ON `questions`.quiz_id = `quiz`.quiz_id LEFT JOIN `answers` on `questions`.question_id = `answers`.`question_id` LEFT JOIN ( SELECT selected_question_id, count(result_id) as answer_count FROM `results` GROUP BY selected_question_id ) r ON r.selected_question_id = answers.answer_id LEFT JOIN (SELECT question_id, count(question_id) as question_count FROM `results` GROUP BY question_id ) q ON q.question_id = `questions`.`question_id` WHERE `quiz`.quiz_id =?";
+        // let responseCounts = "SELECT quiz.quiz_name, questions.question_id, questions.question, answers.answer_id, answers.answer_text, answers.correct, IFNULL(selection_counts.answer_count, 0) AS answer_count, IFNULL(question_counts.question_count, 0) AS question_count, ROUND((IFNULL(selection_counts.answer_count, 0)/IFNULL(question_counts.question_count, 0))*100, 2) as score FROM `quiz` LEFT JOIN `questions` ON questions.quiz_id = quiz.quiz_id LEFT JOIN `answers` ON questions.question_id = answers.question_id LEFT JOIN ( SELECT selected_question_id, IFNULL(count(result_id), 0) as answer_count FROM `results` GROUP BY selected_question_id ) AS selection_counts ON selection_counts.selected_question_id = answers.answer_id LEFT JOIN ( SELECT questions.question_id, IFNULL(COUNT(question_count), 0) as question_count FROM `questions` LEFT JOIN ( SELECT question_id, employee_id as question_count FROM `results` GROUP BY employee_id, question_id ) AS counts ON counts.question_id=questions.question_id GROUP BY question_id, quiz_id ) AS question_counts ON question_counts.question_id = questions.question_id WHERE quiz.quiz_id =?"
         mysql.pool.query(responseCounts, req.query.quiz_id, function(error, results) {
             if (error) {
                 res.write(JSON.stringify(error));
@@ -21,7 +22,7 @@ module.exports = function(){
                 let copy2 = results;
                 let copy = JSON.stringify(results);
                 console.log(typeof(copy));
-                console.log(JSON.stringify(results));
+                console.log("results = ", JSON.stringify(results));
                 // results = Object.values(JSON.parse(JSON.stringify(results)))
                 results = JSON.parse(JSON.stringify(results));
 
@@ -30,17 +31,18 @@ module.exports = function(){
                     if (results[i].correct == 1) {
                         if (tableData[results[i].question_id]) {
                             if (!results[i].score || results[i].score == null) {
-                                pieData[results[i].question_id] = pieData[results[i].question_id]/2;
+                                pieData[results[i].question_id] = pieData[results[i].question_id];
 
                                 tableData[results[i].question_id].push(["", results[i].answer_text, 0, pieData[results[i].question_id]], i);
 
                             } else {
-                                pieData[results[i].question_id] = (pieData[results[i].question_id]+results[i].score)/2;
+                                pieData[results[i].question_id] = ((pieData[results[i].question_id]+results[i].score)/2);
                                 tableData[results[i].question_id].push(["", results[i].answer_text, results[i].score, pieData[results[i].question_id]], i);
                             }
 
                         } else {
                             tableData[results[i].question_id] = [];
+                            tableData[results[i].question_id]['question_id'] = results[i].question_id;
 
 
 
@@ -74,12 +76,12 @@ module.exports = function(){
                         data[results[i].question_id]['answers'][results[i].answer_id]['count'] = results[i].answer_count;
                     }
                 };
-
+                console.log("pieData=",pieData);
                 for (let p = 0; p < Object.keys(tableData).length; p++) {
                     tableData[Object.keys(tableData)[p]]['id'] = p+1;
                     for (let r = 0; r < tableData[Object.keys(tableData)[p]].length; r++) {
 
-                        console.log(tableData[Object.keys(tableData)[p]][r]);
+                        console.log("tableData[Object.keys(tableData)[p]][r]=",tableData[Object.keys(tableData)[p]][r]);
                         tableData[Object.keys(tableData)[p]][r][3] = pieData[Object.keys(tableData)[p]];
                     }
                 }

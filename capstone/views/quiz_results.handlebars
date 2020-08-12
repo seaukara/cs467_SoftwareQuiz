@@ -34,7 +34,7 @@
                 labels: ["Incorrect", "Correct"],
                 datasets: [{
                     data: [100-parseInt("{{score}}"), (parseInt("{{score}}"))],
-                    backgroundColor: ["#744444", "#749785", "#a8bcf1", "#2f3249"]
+                    backgroundColor: ["#746844", "#7f7497", "#a8bcf1", "#2f3249", "#85a2ea", "#5c344d", "#a8bcf1", "#595c52"]
 
                 }]
             },
@@ -227,25 +227,46 @@
 
 
     });
-    function getInfo(div, data, question) {
+    function getInfo(data, question, r) {
+
+        var decodedJson = decodeURIComponent("{{{copy3}}}");
+        var jsonObj = JSON.parse(decodedJson);
+        let details = jsonObj[r]['answers'];
+        let slices = [];
+        let total_count = 0;
+        let labels = [];
+        for (let i = 0; i < Object.keys(details).length; i++) {
+            slices.push(details[Object.keys(details)[i]].count);
+
+            total_count+=details[Object.keys(details)[i]].count;
+            labels.push(details[Object.keys(details)[i]].answer);
+        }
+        for (let i = 0; i < slices.length; i++) {
+            slices[i] = Math.round((slices[i]/total_count)*100);
+        }
+        console.log("slices: ", slices);
         let co = 1;
         for (let t = 0; t < document.getElementsByClassName("question_rows").length; t++) {
             document.getElementById("r_".concat(co)).style['backgroundColor']= "white";
             console.log("ROW=", document.getElementById("r_".concat(co)))
             co++;
         }
-        console.log("score = ", data);
-        let score = data;
+        console.log("details = ", details);
+
         let chart = window.myPieChart;
-        // console.log(window.myPieChart.config.data);
-        let slices = [100-data, data];
+
+
         chart.data.datasets.forEach((dataset) => {
             console.log("dataset.data =", dataset.data);
             dataset.data = [];
         });
+        chart.data.labels = [];
+        labels.forEach(function(label) {
 
+            chart.data.labels.push(label);
+        })
         chart.data.datasets.forEach((dataset) => {
-            dataset.data = [100-data, data];
+            dataset.data = slices;
 
             console.log("dataset.data 2 =", dataset.data)
         });
@@ -260,18 +281,18 @@
         // document.getElementById("qcorrect").hidden = false;
         document.getElementById("qcorrect-per1").hidden = false;
 
-        document.getElementById("qcorrect-per1").innerText = score;
+        document.getElementById("qcorrect-per1").innerText = Math.round(data);
         document.getElementById("qcorrect-per1").innerText=document.getElementById("qcorrect-per1").innerText.concat("%")
         document.getElementById("qcorrect-per2").hidden = false;
 
-        document.getElementById("qcorrect-per2").innerText = 100-score;
+        document.getElementById("qcorrect-per2").innerText = 100-(Math.round(data));
         document.getElementById("qcorrect-per2").innerText=document.getElementById("qcorrect-per2").innerText.concat("%")
 
 
-    }
+    }"#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260'
     function graphClickEvent(event, array){
-        let col = ["#749785", "#425179", "#a8bcf1", "#009acc", '#364d4e', '#59e21e', '#ACF8E2'];
-        let colClear = ["#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260'];
+        let col = ["#749785", "#425179", "#a8bcf1", "#009acc", '#364d4e', '#59e21e', '#ACF8E2', "#749785", "#425179", "#a8bcf1", "#009acc", '#364d4e', '#59e21e', '#ACF8E2'];
+        let colClear = ["#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260', "#74978560", "#42517960", "#a8bcf160", "#009acc60", '#364d4e60', '#59e21e60', '#ACF8E260'];
         var decodedJson = decodeURIComponent("{{{copy3}}}");
         var jsonObj = JSON.parse(decodedJson);
         var activeElement = window.myBarChart.getElementAtEvent(event)[0];
@@ -339,6 +360,9 @@
             co++;
         }
         document.getElementById("r_".concat(activeElement._model.label.split("Question ")[1])).style["backgroundColor"]="#fed189";
+
+
+
         // document.getElementById("memory").background = [activeElement._datasetIndex, activeElement._index];
     }
     function closeInfo() {
@@ -424,9 +448,9 @@
 
                         <section id="question_pie" class="card" style="margin-top:5px;"  hidden>
                             <div class="card-header"><p id="pieHeader" class="mb-0 font-weight-bold">Results by Question</p></div>
-                            <div  class="card-body" style="padding:30px;padding-top:10px;padding-bottom:10px">
+                            <div  class="card-body" style="padding:10px;padding-top:10px;padding-bottom:10px">
                                 <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"></div>
-                                <canvas id="chart-line" height=100px class="chartjs-render-monitor" style="display: block;"></canvas>
+                                <canvas id="chart-line" class="chartjs-render-monitor" style="display: block;"></canvas>
                             </div>
                             <div class="row">
                             <section id="question_pie1" class="card" style="margin:1%;width:48%;z-index:1;float:left" hidden>
@@ -515,7 +539,7 @@
                                         </td>
 {{!--                                        <td>button</td>--}}
 
-                                        <td><button class="badge bg-important" style="padding-bottom: 10px;font-weight:500;border:none" onclick="getInfo(this, {{r.[0].[3]}}, '{{{r.[0].[0]}}}')" >View</button></td>
+                                        <td><button class="badge bg-important" style="padding-bottom: 10px;font-weight:500;border:none" onclick="getInfo({{r.[0].[3]}}, '{{{r.[0].[0]}}}', {{r.question_id}})" >View</button></td>
 
                                         </tr>
 
