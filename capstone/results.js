@@ -83,15 +83,21 @@ module.exports = function(){
         
 
                     if (answerStringObj[results[i].answer_id] === undefined){ 
-                        var answerString = "<p>" + results[i].answer_text + "</p>";
-                        quizStringObj[curr_id] += answerString;
+                        if (results[i].correct === 1){
+                            var answerString = "<p>" + results[i].answer_text + "<span>&#10062;</span></p>";
+                            quizStringObj[curr_id] += answerString;
+                        }
+                        else {
+                            var answerString = "<p>" + results[i].answer_text + "</p>";
+                            quizStringObj[curr_id] += answerString;
+                        }
                       
                     }
                 }
             
                 
                 var quizHTML = "<div style='text-align: center;'><div style='display: inline-block; text-align: left;'>" + "<h5>" + employee_name + " got " + actual_correct 
-                                    + " out of " + max_correct + " correct. Below are the results!</h5><span style='color:MediumSeaGreen;'> &#9745; = Correct Selection</span><br><span style='color:Tomato;'> &#9746; = Incorrect Selection</span><br><span> Blank = No Selection</span><br><br>";
+                                    + " out of " + max_correct + " correct. Below are the results!</h5><span style='color:Blue;'> &#9745; = Correct Selection</span><br><span style='color:Tomato;'> &#9746; = Incorrect Selection</span><br><span style='color:MediumSeaGreen;'> &#10062; = Correct Answer, but not selected</span><br><span> Blank = No Selection</span><br><br>";
                 /* Object.entries unsupported on node version 6
                 for (const [key, value] of Object.entries(quizStringObj)){
                     quizHTML += `${value}`;
