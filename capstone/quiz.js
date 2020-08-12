@@ -41,8 +41,8 @@ module.exports = function(){
 		mysql.pool.query( query, params, function(error, results, fields) {
 		
 			// log query results
-			console.log("User Results\n", results);
-			console.log("length", results.length);
+			console.log("Questions and Answers\n", results);
+			// console.log("length", results.length);
 			if(error){
 				res.write(JSON.stringify(error));
 				res.end();
@@ -110,29 +110,25 @@ module.exports = function(){
 					    		}
 					  		}
 						}	
+					}
 
-						if (answerStringObj[results[i].answer_id] === undefined){ 
-						  	var answerString = "<p>" + results[i].answer_text + "</p>";
-						  	emailStringObj[curr_id] += answerString;
+					if (answerStringObj[results[i].answer_id] === undefined){ 
+						var answerString = "<p>" + results[i].answer_text + "</p>";
+						emailStringObj[curr_id] += answerString;
 						  
-						}
 					}
 				}
 				
 				var emailString = "<div style='text-align: center;'><div style='display: inline-block; text-align: left;'>" + "<h1>" + fname + " " + lname + " has just taken the " 
 									+ quiz_name + " quiz! " + fname + " got " + correct_count 
 									+ " out of " + max_correct + " correct. Below are the results!</h1><span style='color:MediumSeaGreen;'> &#9745; = Correct Selection</span><br><span style='color:Tomato;'> &#9746; = Incorrect Selection</span><br><span> Blank = No Selection</span><br><br>";
-				/* Object.entries unsupported on node version 6
-				for (const [key, value] of Object.entries(emailStringObj)){
-					emailString += `${value}`;
-				}
-				*/
+
 				for (const property in emailStringObj){
 					emailString += `${emailStringObj[property]}`;
 				}
 				emailString += "</div></div>";
 
-				console.log(emailStringObj);
+				// console.log(emailStringObj);
 				console.log(emailString);
 				get_and_send_email(req, res, emailString, fname, lname, quiz_name, quiz_id);
 
@@ -190,7 +186,7 @@ module.exports = function(){
 		mysql.pool.query(query, [req.session.quiz_id],
 		function (error, results, fields) {
 			// log query results
-			console.log("Results\n", results);
+			// console.log("Results\n", results);
 
 			if(error){
 				res.write(JSON.stringify(error));
@@ -262,6 +258,7 @@ module.exports = function(){
 
 						checkUserAnswers(req, res, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name, req.session.quiz_id);
 						req.session.destroy();
+						context.no_display_signout = true;
 						res.render('login', context);
 					}
 				});
@@ -278,7 +275,7 @@ module.exports = function(){
 	    mysql.pool.query('SELECT * FROM (SELECT question_id, question FROM questions WHERE quiz_id=?) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id', [req.session.quiz_id],
 	        function (error, results, fields) {
 	        // log query results
-	        console.log("Results\n", results);
+	        // console.log("Results\n", results);
 
 	        if(error){
 	            res.write(JSON.stringify(error));
@@ -313,11 +310,11 @@ module.exports = function(){
 	            var question_answer_obj = {question: results[i-1].question, question_id: current_question_id, mult_correct: questMultCorrect, answers: answers_arr};
 	            questions.push(question_answer_obj);
 
-	            console.log("questions", questions);
+	            // console.log("questions", questions);
 	            context.questions = questions;
 	            context.quiz_name = quiz_name;
 	            context.timer = timer;
-
+	            context.no_display_signout = true;
 	            res.render('quiz', context);
 	            
 	        }
@@ -329,10 +326,6 @@ module.exports = function(){
      // if the user has not logged in, make them do so	
      router.all('*', function (req, res, next) {
           if (req.session.quiz_id === undefined || req.session.quiz_name === undefined || req.session.employee_id === undefined) {
-	            console.log("redirect");
-	            console.log(req.session.quiz_id);
-			  	console.log(req.session.quiz_name);
-			  	console.log(req.session.employee_id);
                	res.redirect('/login')
           }
           else {
@@ -355,7 +348,7 @@ module.exports = function(){
   		mysql.pool.query('SELECT * FROM quiz_employee WHERE employee_id=? AND quiz_id=?', [req.session.employee_id, req.session.quiz_id],
 	        function (error, results, fields) {
 	        // log query results
-	        console.log("CHecking if quiz has already taken\n", results);
+	        // console.log("CHecking if quiz has already taken\n", results);
 
 	        if(error){
 	            res.write(JSON.stringify(error));
@@ -365,6 +358,7 @@ module.exports = function(){
 	        
 	        if (results.length != 0){
 	        	context.alreadyTaken = true;
+	        	context.no_display_signout = true;
 	        	res.render('login',context);
 	        }
 
@@ -385,13 +379,13 @@ module.exports = function(){
 		var mysql = req.app.get('mysql');
 		var session = req.app.get('session');
   		
-  		console.log("body", req.body);
+  		// console.log("body", req.body);
   		const user_answers = Object.keys(req.body);
 
 		// Log the user as having taken the quiz
 		mysql.pool.query('INSERT INTO quiz_employee (quiz_id, employee_id, quiz_taken) VALUES (?,?,?)', [req.session.quiz_id, req.session.employee_id, '1'], function (error, results, fields) {
         	// log query results
-        	console.log("INSERT Results\n", results);
+        	// console.log("INSERT Results\n", results);
 
 	        if(error){
 	            res.write(JSON.stringify(error));
@@ -403,6 +397,7 @@ module.exports = function(){
 				var emailString = "<h1>" + req.session.employee_fname + " " + req.session.employee_lname + " submitted a blank quiz </h1>";
 				get_and_send_email(req, res, emailString, req.session.employee_fname, req.session.employee_lname, req.session.quiz_name, req.session.quiz_id);
 				context.quiz_finished = true;
+				context.no_display_signout = true;
 
 				res.render('login', context);
 			}
