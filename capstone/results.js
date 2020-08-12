@@ -276,6 +276,7 @@ module.exports = function(){
             if (results.length === 0){
                 context.display_quiz_list = false;
                 context.display_quiz_table = true;
+                context.full_name = full_name;
                 res.render('employee_results', context);
             }
             else {
