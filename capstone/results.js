@@ -122,7 +122,7 @@ module.exports = function(){
 
     // if the user has not logged in, make them do so  
      router.all('*', function (req, res, next) {
-          if (!req.session.employer_id == null || req.session.employer_id == null) {
+          if (!req.session.employer_id || req.session.employer_id == null) {
                 console.log("redirect");
                 console.log(req.session.quiz_id);
                 console.log(req.session.quiz_name);
@@ -133,6 +133,7 @@ module.exports = function(){
                next();
           }
      });
+
 
     router.get('/results_quiz', function(req,res){
         if (!req.session.employer_id || req.session.employer_id == null) {
@@ -272,15 +273,30 @@ module.exports = function(){
                 res.write(JSON.stringify(error));
                 res.end();
             } 
-            
-            var full_name = results[0].fname + " " + results[0].lname;
-            context.full_name = full_name;
+
+
 
             if (results.length === 0){
-                context.display_quiz_list = false;
-                context.display_quiz_table = true;
-                context.full_name = full_name;
-                res.render('employee_results', context);
+
+                mysql.pool.query('SELECT fname, lname FROM employee WHERE employee_id=?', [req.query.employee_id], function(error,results,fields){
+                    if(error){
+                        res.write(JSON.stringify(error));
+                        res.end();
+                    } 
+
+                    else {
+                        var full_name = results[0].fname + " " + results[0].lname;
+                        context.full_name = full_name;
+
+                        context.display_quiz_list = false;
+                        context.display_quiz_table = true;
+                        context.full_name = full_name;
+                        res.render('employee_results', context);
+                    }
+
+                });
+
+                
             }
             else {
                 var quiz = [];
@@ -289,6 +305,9 @@ module.exports = function(){
                     quiz.push({quiz_name: results[i].quiz_name, quiz_id: results[i].quiz_id, employee_id: results[i].employee_id, max_correct: 0, actual_correct: 0, percent: 0});
                     params.push(String(results[i].quiz_id));
                 }
+
+                var full_name = results[0].fname + " " + results[0].lname;
+                context.full_name = full_name;
 
                 query = "SELECT quiz_id, COUNT(correct) as max_correct FROM (SELECT t1.quiz_id, t1.question_id, answer_id, t1.question, answer_text, correct FROM (SELECT quiz_id, question_id, question FROM questions WHERE quiz_id IN (?)) AS t1 INNER JOIN answers ON answers.question_id = t1.question_id) as t2 WHERE correct='1' GROUP BY quiz_id";
                 
